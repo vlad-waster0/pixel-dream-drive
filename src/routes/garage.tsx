@@ -19,6 +19,7 @@ export const Route = createFileRoute("/garage")({
 function Garage() {
   const navigate = useNavigate();
   const [heroIn, setHeroIn] = useState(false);
+  const [zoomCar, setZoomCar] = useState<any | null>(null);
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroIn(true), 100);
@@ -49,18 +50,6 @@ function Garage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         <div className="absolute inset-0 bg-scanlines pointer-events-none" />
-
-        <div className="absolute inset-x-0 bottom-0 px-4 md:px-12 pb-12">
-          <div className={`transition-all duration-1000 delay-500 ${heroIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-            <div className="text-[10px] md:text-xs tracking-[0.5em] text-primary mb-3">ÄNGELHOLM · 1994 — ∞</div>
-            <h1 className="font-display text-4xl md:text-7xl lg:text-8xl font-black tracking-widest text-glow-red leading-none">
-              KOENIGSEGG
-            </h1>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl">
-              Toda a linhagem de hipercarros suecos. Do CC8S original ao Jesko Absolut.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* MARQUEE — auto-scrolling cards */}
@@ -99,7 +88,7 @@ function Garage() {
 
         <div className="space-y-4">
           {cars.map((c, i) => (
-            <CarSquareCard key={c.id} car={c} index={i} onClick={() => handleCar(c.id)} />
+            <CarSquareCard key={c.id} car={c} index={i} onClick={() => handleCar(c.id)} onZoom={() => setZoomCar(c)} />
           ))}
         </div>
 
@@ -114,19 +103,80 @@ function Garage() {
       <footer className="border-t border-border py-8 text-center">
         <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG AUTOMOTIVE AB · SVERIGE</div>
       </footer>
+
+      {zoomCar && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-glitch-in"
+          onClick={() => setZoomCar(null)}
+        >
+          <div className="absolute top-6 right-6 text-[10px] tracking-[0.4em] text-white/60">FECHAR ✕</div>
+          <div className="relative max-w-5xl w-full">
+            <img
+              src={zoomCar.image}
+              alt={zoomCar.name}
+              className="w-full h-auto object-contain max-h-[80vh] no-save"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+            />
+            <div className="text-center mt-4">
+              <div className="text-[10px] tracking-[0.4em] text-primary">{zoomCar.year}</div>
+              <div className="font-display text-3xl tracking-widest text-glow-red">{zoomCar.name.toUpperCase()}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function CarSquareCard({ car, index, onClick }: any) {
+function CarSquareCard({ car, index, onClick, onZoom }: any) {
   const [pressed, setPressed] = useState(false);
+  const [longPress, setLongPress] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggeredRef = useRef(false);
+
+  const startPress = () => {
+    triggeredRef.current = false;
+    setLongPress(true);
+    timerRef.current = setTimeout(() => {
+      triggeredRef.current = true;
+      setLongPress(false);
+      onZoom();
+    }, 550);
+  };
+  const cancelPress = () => {
+    setLongPress(false);
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+  };
+  const handleClick = () => {
+    if (triggeredRef.current) return;
+    setPressed(true);
+    setTimeout(onClick, 250);
+    playRev(0.5);
+  };
+
   return (
     <button
-      onClick={() => { setPressed(true); setTimeout(onClick, 250); playRev(0.5); }}
-      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed ? "scale-95 brightness-150" : ""}`}
+      onClick={handleClick}
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      onContextMenu={(e) => e.preventDefault()}
+      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed ? "scale-95 brightness-150" : ""} ${longPress ? "scale-[1.04]" : ""}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <img src={car.image} alt={car.name} loading="eager" decoding="async" className="absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105" />
+      <img
+        src={car.image}
+        alt={car.name}
+        loading="eager"
+        decoding="async"
+        draggable={false}
+        onDragStart={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
+        className={`no-save absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105 ${longPress ? "scale-125" : ""}`}
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       <div className="absolute inset-0 bg-scanlines opacity-20" />
 
