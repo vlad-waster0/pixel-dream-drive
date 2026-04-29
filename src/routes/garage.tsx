@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
