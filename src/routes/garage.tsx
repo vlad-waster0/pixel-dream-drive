@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { cars } from "@/data/cars";
+import { cars, type Car } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import historyImg from "@/assets/history.jpg";
@@ -20,7 +20,7 @@ function Garage() {
   const [heroIn, setHeroIn] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [muted, setMuted] = useState(false);
-  const [zoomCar, setZoomCar] = useState<any | null>(null);
+  const [zoomCar, setZoomCar] = useState<Car | null>(null);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -146,7 +146,7 @@ function Garage() {
   );
 }
 
-function CarSquareCard({ car, index, onClick, onZoom }: any) {
+function CarSquareCard({ car, index, onClick, onZoom }: { car: Car; index: number; onClick: () => void; onZoom: () => void }) {
   const [pressed, setPressed] = useState(false);
   const [longPress, setLongPress] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
