@@ -43,7 +43,6 @@ function CarPage() {
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
-  const [animKey, setAnimKey] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
