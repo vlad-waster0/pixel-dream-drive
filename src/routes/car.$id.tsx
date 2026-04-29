@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
-import { playRev, playClick } from "@/lib/engine-sound";
+import { playClick } from "@/lib/engine-sound";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
