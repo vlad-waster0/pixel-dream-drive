@@ -61,6 +61,27 @@ function NoSaveScript() {
           document.addEventListener('dragstart', function(e){
             var t=e.target; if(t && (t.tagName==='IMG' || t.tagName==='VIDEO')) e.preventDefault();
           });
+          // Override media session metadata (browser media notification)
+          (function(){
+            function setMeta(){
+              try {
+                if ('mediaSession' in navigator) {
+                  var blackArt = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#000"/></svg>');
+                  navigator.mediaSession.metadata = new MediaMetadata({
+                    title: 'Koenigsegg Jesko',
+                    artist: 'Absolut',
+                    album: '',
+                    artwork: [
+                      { src: blackArt, sizes: '512x512', type: 'image/svg+xml' }
+                    ]
+                  });
+                }
+              } catch(e) {}
+            }
+            setMeta();
+            document.addEventListener('play', setMeta, true);
+            setInterval(setMeta, 2000);
+          })();
         `,
       }}
     />
