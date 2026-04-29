@@ -29,6 +29,18 @@ const COLORS = [
   { name: "EMERALD", hex: "#0f7a3d", filter: "hue-rotate(120deg) saturate(1.3)" },
 ];
 
+// Accent (stripes/details) — overlay via mix-blend-mode
+const ACCENTS = [
+  { name: "OFF", hex: "transparent" },
+  { name: "ELECTRIC", hex: "#3b82f6" },
+  { name: "YELLOW", hex: "#facc15" },
+  { name: "RED", hex: "#ef4444" },
+  { name: "LIME", hex: "#84cc16" },
+  { name: "MAGENTA", hex: "#ec4899" },
+  { name: "ORANGE", hex: "#f97316" },
+  { name: "WHITE", hex: "#ffffff" },
+];
+
 const PARTS = [
   { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO", info: "Motor V8 5.0L biturbo desenvolvido inteiramente in-house. Bloco em alumínio fundido, virabrequim plano (flat-plane crank) e capacidade de operar com gasolina ou etanol E85, dobrando a potência no biocombustível." },
   { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON", info: "Tecnologia exclusiva da Koenigsegg: roda monobloco em fibra de carbono oca por dentro, pesando até 40% menos que rodas forjadas de alumínio. Reduz massa não-suspensa e melhora tudo." },
@@ -43,10 +55,12 @@ function CarPage() {
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
+  const [accentIdx, setAccentIdx] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
   const pendingColor = COLORS[pendingIdx];
+  const currentAccent = ACCENTS[accentIdx];
 
   const applyColor = (nextIdx: number) => {
     setPendingIdx(nextIdx);
@@ -91,9 +105,20 @@ function CarPage() {
             alt={car.fullName}
             loading="eager"
             decoding="async"
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
             className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
             style={{ filter: currentColor.filter }}
           />
+
+          {/* Accent tint overlay */}
+          {currentAccent.hex !== "transparent" && (
+            <div
+              className="absolute inset-0 pointer-events-none transition-[background-color,opacity] duration-500"
+              style={{ backgroundColor: currentAccent.hex, mixBlendMode: "color", opacity: 0.45 }}
+            />
+          )}
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
@@ -139,10 +164,28 @@ function CarPage() {
 
         {/* color quick chips */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">PALETA:</span>
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">DETALHES:</span>
           {COLORS.map((c, i) => (
             <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${pendingIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
           ))}
+        </div>
+
+        {/* second selector — base car color (accent tint) */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">COR DO CARRO:</span>
+          {ACCENTS.map((a, i) => (
+            <button
+              key={a.name}
+              onClick={() => { playClick(); setAccentIdx(i); }}
+              className={`relative w-6 h-6 rounded-full border-2 transition ${accentIdx === i ? "border-primary scale-125" : "border-border"}`}
+              style={{ backgroundColor: a.hex === "transparent" ? "#222" : a.hex }}
+              aria-label={a.name}
+              title={a.name}
+            >
+              {a.hex === "transparent" && <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white/60">✕</span>}
+            </button>
+          ))}
+          <span className="text-[10px] tracking-[0.3em] text-foreground ml-2">{currentAccent.name}</span>
         </div>
       </section>
 
