@@ -94,6 +94,12 @@ function LocationsPage() {
             <div className="font-display text-xl mt-2">OS CARROS ▸</div>
           </Link>
         </div>
+
+        <Link to="/creator" className="mt-4 block border border-border hover:border-primary transition p-5 group relative overflow-hidden">
+          <div className="text-[10px] tracking-[0.4em] text-primary">CONHEÇA</div>
+          <div className="font-display text-xl mt-2">O CRIADOR ▸</div>
+          <div className="text-xs text-muted-foreground mt-1">Christian von Koenigsegg — fundador & CEO</div>
+        </Link>
       </section>
     </div>
   );
