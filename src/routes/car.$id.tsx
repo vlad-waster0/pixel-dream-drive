@@ -164,10 +164,28 @@ function CarPage() {
 
         {/* color quick chips */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">PALETA:</span>
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">DETALHES:</span>
           {COLORS.map((c, i) => (
             <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${pendingIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
           ))}
+        </div>
+
+        {/* second selector — base car color (accent tint) */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">COR DO CARRO:</span>
+          {ACCENTS.map((a, i) => (
+            <button
+              key={a.name}
+              onClick={() => { playClick(); setAccentIdx(i); }}
+              className={`relative w-6 h-6 rounded-full border-2 transition ${accentIdx === i ? "border-primary scale-125" : "border-border"}`}
+              style={{ backgroundColor: a.hex === "transparent" ? "#222" : a.hex }}
+              aria-label={a.name}
+              title={a.name}
+            >
+              {a.hex === "transparent" && <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white/60">✕</span>}
+            </button>
+          ))}
+          <span className="text-[10px] tracking-[0.3em] text-foreground ml-2">{currentAccent.name}</span>
         </div>
       </section>
 
