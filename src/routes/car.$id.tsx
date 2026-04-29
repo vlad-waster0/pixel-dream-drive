@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
-import { playRev, playClick } from "@/lib/engine-sound";
+import { playClick } from "@/lib/engine-sound";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -54,25 +54,15 @@ function CarPage() {
   const { id } = useParams({ from: "/car/$id" });
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
   const [colorIdx, setColorIdx] = useState(0);
-  const [pendingIdx, setPendingIdx] = useState(0);
   const [accentIdx, setAccentIdx] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
-  const pendingColor = COLORS[pendingIdx];
   const currentAccent = ACCENTS[accentIdx];
 
   const applyColor = (nextIdx: number) => {
-    setPendingIdx(nextIdx);
     playClick();
-    if (nextIdx === colorIdx) return;
     setColorIdx(nextIdx);
-  };
-
-  const confirmColor = () => {
-    if (pendingIdx === colorIdx) return;
-    playRev(2.2);
-    setColorIdx(pendingIdx);
   };
 
   return (
@@ -114,10 +104,18 @@ function CarPage() {
 
           {/* Accent tint overlay */}
           {currentAccent.hex !== "transparent" && (
-            <div
-              className="absolute inset-0 pointer-events-none transition-[background-color,opacity] duration-500"
-              style={{ backgroundColor: currentAccent.hex, mixBlendMode: "color", opacity: 0.45 }}
-            />
+            <>
+              {/* multiply tints bright/white panels with the chosen color */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+                style={{ backgroundColor: currentAccent.hex, mixBlendMode: "multiply", opacity: 0.85 }}
+              />
+              {/* hue overlay reinforces saturation on mid-tones */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+                style={{ backgroundColor: currentAccent.hex, mixBlendMode: "color", opacity: 0.55 }}
+              />
+            </>
           )}
 
           {/* corners */}
@@ -125,35 +123,6 @@ function CarPage() {
           <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-primary" />
           <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-primary" />
           <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-primary" />
-
-          {/* Color slider — vertical */}
-          <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
-            <div className="text-[9px] tracking-[0.3em] text-primary">COR</div>
-            <input
-              type="range"
-              min={0}
-              max={COLORS.length - 1}
-              step={1}
-              value={pendingIdx}
-              onChange={(e) => applyColor(Number(e.target.value))}
-              className="vertical-slider"
-              style={{
-                writingMode: "vertical-lr" as any,
-                WebkitAppearance: "slider-vertical" as any,
-                width: "8px",
-                height: "180px",
-                accentColor: pendingColor.hex,
-              }}
-            />
-            <div className="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg" style={{ backgroundColor: pendingColor.hex, boxShadow: `0 0 20px ${pendingColor.hex}` }} />
-            <div className="text-[9px] tracking-[0.3em] text-foreground">{pendingColor.name}</div>
-            <button
-              onClick={confirmColor}
-              className="px-3 py-1.5 bg-primary text-primary-foreground text-[10px] tracking-[0.3em] font-bold hover:brightness-125 transition animate-pulse-red"
-            >
-              OK
-            </button>
-          </div>
 
           {/* Speed badge */}
           <div className="absolute left-3 md:left-5 top-3 md:top-5 border border-primary/50 bg-background/70 backdrop-blur px-2 py-1">
@@ -166,7 +135,7 @@ function CarPage() {
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">DETALHES:</span>
           {COLORS.map((c, i) => (
-            <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${pendingIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
+            <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${colorIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
           ))}
         </div>
 
