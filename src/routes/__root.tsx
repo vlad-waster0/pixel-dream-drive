@@ -20,8 +20,10 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google", content: "notranslate" },
       { httpEquiv: "Content-Language", content: "pt-BR" },
-      { title: "KOENIGSEGG — Hipercarros Suecos" },
-      { name: "description", content: "Toda a linhagem Koenigsegg. CC8S ao Jesko." },
+      { title: "Koenigsegg Jesko" },
+      { name: "description", content: "Absolut" },
+      { property: "og:title", content: "Koenigsegg Jesko" },
+      { property: "og:site_name", content: "Absolut" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
