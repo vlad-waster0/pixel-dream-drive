@@ -138,42 +138,49 @@ function Garage() {
 
         <div className="space-y-4">
           {cars.map((c, i) => (
-            <CarSquareCard
-              key={c.id}
-              car={c}
-              index={i}
-              onClick={() => handleCar(c.id)}
-              onZoom={() => setZoomCar(c)}
-            />
+            <ScrollHide key={c.id} scrollY={scrollY} strength={0.95}>
+              <CarSquareCard
+                car={c}
+                index={i}
+                onClick={() => handleCar(c.id)}
+                onZoom={() => setZoomCar(c)}
+              />
+            </ScrollHide>
           ))}
         </div>
 
         {/* About brand & factory */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-          <ImageCard
-            to="/brand"
-            num="/01"
-            title="HISTÓRIA"
-            sub="DA MARCA"
-            cta="DESCOBRIR ▸"
-            img={historyImg}
-          />
-          <ImageCard
-            to="/factory"
-            num="/02"
-            title="FÁBRICA"
-            sub="ÄNGELHOLM, SUÉCIA"
-            cta="VISITAR ▸"
-            img={factoryImg}
-          />
-          <ImageCard
-            to="/locations"
-            num="/03"
-            title="LOCAIS"
-            sub="VENDA · ALUGUEL · MUSEUS"
-            cta="EXPLORAR ▸"
-            img={locationsImg}
-          />
+          <ScrollHide scrollY={scrollY} strength={0.85}>
+            <ImageCard
+              to="/brand"
+              num="/01"
+              title="HISTÓRIA"
+              sub="DA MARCA"
+              cta="DESCOBRIR ▸"
+              img={historyImg}
+            />
+          </ScrollHide>
+          <ScrollHide scrollY={scrollY} strength={0.85}>
+            <ImageCard
+              to="/factory"
+              num="/02"
+              title="FÁBRICA"
+              sub="ÄNGELHOLM, SUÉCIA"
+              cta="VISITAR ▸"
+              img={factoryImg}
+            />
+          </ScrollHide>
+          <ScrollHide scrollY={scrollY} strength={0.85}>
+            <ImageCard
+              to="/locations"
+              num="/03"
+              title="LOCAIS"
+              sub="VENDA · ALUGUEL · MUSEUS"
+              cta="EXPLORAR ▸"
+              img={locationsImg}
+            />
+          </ScrollHide>
         </div>
       </section>
 
@@ -208,6 +215,35 @@ function Garage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ScrollHide({
+  children,
+  scrollY,
+  strength = 1,
+}: {
+  children: ReactNode;
+  scrollY: number;
+  strength?: number;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const rect = ref.current?.getBoundingClientRect();
+  const height = Math.max(1, rect?.height ?? 1);
+  const top = rect?.top ?? 0;
+  const progress = Math.min(1, Math.max(0, -top / (height * 0.55)));
+  const style: CSSProperties = {
+    opacity: 1 - progress,
+    transform: `translateY(${progress * 180 * strength}px) scale(${1 - progress * 0.08})`,
+    filter: `blur(${progress * 8}px)`,
+    pointerEvents: progress > 0.85 ? "none" : "auto",
+    willChange: "transform, opacity, filter",
+  };
+
+  return (
+    <div ref={ref} style={style} className="transition-[filter] duration-150 ease-out">
+      {children}
     </div>
   );
 }
