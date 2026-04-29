@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { cars } from "@/data/cars";
+import { cars, type Car } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import historyImg from "@/assets/history.jpg";
@@ -20,6 +20,7 @@ function Garage() {
   const [heroIn, setHeroIn] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [muted, setMuted] = useState(false);
+  const [zoomCar, setZoomCar] = useState<Car | null>(null);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -27,7 +28,12 @@ function Garage() {
     v.muted = false;
     v.volume = 1;
     const p = v.play();
-    if (p) p.catch(() => { v.muted = true; setMuted(true); v.play().catch(() => {}); });
+    if (p)
+      p.catch(() => {
+        v.muted = true;
+        setMuted(true);
+        v.play().catch(() => {});
+      });
   }, []);
 
   const toggleMute = () => {
@@ -40,7 +46,9 @@ function Garage() {
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroIn(true), 100);
-    return () => { clearTimeout(t1); };
+    return () => {
+      clearTimeout(t1);
+    };
   }, []);
 
   const handleCar = (id: string) => {
@@ -52,9 +60,14 @@ function Garage() {
       <Header />
 
       {/* HERO */}
-      <section className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer" onClick={toggleMute}>
+      <section
+        className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer"
+        onClick={toggleMute}
+      >
         <div className="absolute inset-0 bg-grid opacity-20" />
-        <div className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}>
+        <div
+          className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}
+        >
           <video
             ref={videoRef}
             src={introVideo}
@@ -81,7 +94,13 @@ function Garage() {
               onClick={() => handleCar(c.id)}
               className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition bg-black"
             >
-              <img src={c.image} alt={c.name} loading="eager" decoding="async" className="absolute inset-0 w-full h-full object-contain p-1 transition-transform duration-700 group-hover:scale-105" />
+              <img
+                src={c.image}
+                alt={c.name}
+                loading="eager"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-contain p-1 transition-transform duration-700 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
                 <div className="text-[8px] tracking-[0.3em] text-primary">{c.year}</div>
@@ -97,68 +116,139 @@ function Garage() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <div className="text-[10px] tracking-[0.4em] text-primary">COLEÇÃO</div>
-            <h2 className="font-display text-2xl md:text-3xl font-black tracking-wider mt-1">TODOS OS MODELOS</h2>
+            <h2 className="font-display text-2xl md:text-3xl font-black tracking-wider mt-1">
+              TODOS OS MODELOS
+            </h2>
           </div>
-          <div className="text-[10px] tracking-[0.3em] text-muted-foreground">{cars.length} CARROS</div>
+          <div className="text-[10px] tracking-[0.3em] text-muted-foreground">
+            {cars.length} CARROS
+          </div>
         </div>
 
         <div className="space-y-4">
           {cars.map((c, i) => (
-            <CarSquareCard key={c.id} car={c} index={i} onClick={() => handleCar(c.id)} />
+            <CarSquareCard
+              key={c.id}
+              car={c}
+              index={i}
+              onClick={() => handleCar(c.id)}
+              onZoom={() => setZoomCar(c)}
+            />
           ))}
         </div>
 
         {/* About brand & factory */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-          <ImageCard to="/brand" num="/01" title="HISTÓRIA" sub="DA MARCA" cta="DESCOBRIR ▸" img={historyImg} />
-          <ImageCard to="/factory" num="/02" title="FÁBRICA" sub="ÄNGELHOLM, SUÉCIA" cta="VISITAR ▸" img={factoryImg} />
-          <ImageCard to="/locations" num="/03" title="LOCAIS" sub="VENDA · ALUGUEL · MUSEUS" cta="EXPLORAR ▸" img={locationsImg} />
+          <ImageCard
+            to="/brand"
+            num="/01"
+            title="HISTÓRIA"
+            sub="DA MARCA"
+            cta="DESCOBRIR ▸"
+            img={historyImg}
+          />
+          <ImageCard
+            to="/factory"
+            num="/02"
+            title="FÁBRICA"
+            sub="ÄNGELHOLM, SUÉCIA"
+            cta="VISITAR ▸"
+            img={factoryImg}
+          />
+          <ImageCard
+            to="/locations"
+            num="/03"
+            title="LOCAIS"
+            sub="VENDA · ALUGUEL · MUSEUS"
+            cta="EXPLORAR ▸"
+            img={locationsImg}
+          />
         </div>
       </section>
 
       <footer className="border-t border-border py-8 text-center">
-        <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG AUTOMOTIVE AB · SVERIGE</div>
+        <div className="text-[10px] tracking-[0.4em] text-muted-foreground">
+          KOENIGSEGG AUTOMOTIVE AB · SVERIGE
+        </div>
       </footer>
+
+      {zoomCar && (
+        <div
+          className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4 animate-glitch-in"
+          onClick={() => setZoomCar(null)}
+        >
+          <div className="absolute top-6 right-6 text-[10px] tracking-[0.4em] text-muted-foreground">
+            FECHAR ✕
+          </div>
+          <div className="relative max-w-5xl w-full">
+            <img
+              src={zoomCar.image}
+              alt={zoomCar.name}
+              className="w-full h-auto object-contain max-h-[80vh] no-save"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+            <div className="text-center mt-4">
+              <div className="text-[10px] tracking-[0.4em] text-primary">{zoomCar.year}</div>
+              <div className="font-display text-3xl tracking-widest text-glow-red">
+                {zoomCar.name.toUpperCase()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function CarSquareCard({ car, index, onClick }: any) {
+function CarSquareCard({
+  car,
+  index,
+  onClick,
+  onZoom,
+}: {
+  car: Car;
+  index: number;
+  onClick: () => void;
+  onZoom: () => void;
+}) {
   const [pressed, setPressed] = useState(false);
-  const [zooming, setZooming] = useState(false);
+  const [longPress, setLongPress] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longFiredRef = useRef(false);
+  const triggeredRef = useRef(false);
 
-  const start = () => {
-    longFiredRef.current = false;
-    setPressed(true);
+  const startPress = () => {
+    triggeredRef.current = false;
+    setLongPress(true);
     timerRef.current = setTimeout(() => {
-      longFiredRef.current = true;
-      setZooming(true);
+      triggeredRef.current = true;
+      setLongPress(false);
+      onZoom();
     }, 550);
   };
-  const cancel = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setPressed(false);
-    setZooming(false);
-  };
-  const end = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setPressed(false);
-    setZooming(false);
-    if (!longFiredRef.current) {
-      setTimeout(onClick, 100);
+  const cancelPress = () => {
+    setLongPress(false);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+  };
+  const handleClick = () => {
+    if (triggeredRef.current) return;
+    setPressed(true);
+    setTimeout(onClick, 250);
   };
 
   return (
     <button
-      onPointerDown={start}
-      onPointerUp={end}
-      onPointerLeave={cancel}
-      onPointerCancel={cancel}
+      onClick={handleClick}
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
       onContextMenu={(e) => e.preventDefault()}
-      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed && !zooming ? "scale-95 brightness-150" : ""}`}
+      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed ? "scale-95 brightness-150" : ""} ${longPress ? "scale-[1.04]" : ""}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <img
@@ -169,7 +259,7 @@ function CarSquareCard({ car, index, onClick }: any) {
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
         onContextMenu={(e) => e.preventDefault()}
-        className={`no-save absolute inset-0 w-full h-full object-contain p-2 transition-transform ease-out ${zooming ? "scale-[1.6] duration-500" : "duration-700 group-hover:scale-105"}`}
+        className={`no-save absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105 ${longPress ? "scale-125" : ""}`}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       <div className="absolute inset-0 bg-scanlines opacity-20" />
@@ -182,15 +272,25 @@ function CarSquareCard({ car, index, onClick }: any) {
 
       <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-6 text-left">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] tracking-[0.4em] text-primary">/{String(index + 1).padStart(2, "0")}</span>
+          <span className="text-[10px] tracking-[0.4em] text-primary">
+            /{String(index + 1).padStart(2, "0")}
+          </span>
           <span className="text-[10px] tracking-[0.3em] text-muted-foreground">{car.year}</span>
         </div>
         <div>
-          <div className="text-[10px] tracking-[0.3em] text-muted-foreground mb-1">{car.tagline}</div>
-          <div className="font-display text-3xl md:text-5xl font-black tracking-wider text-glow-red">{car.name.toUpperCase()}</div>
+          <div className="text-[10px] tracking-[0.3em] text-muted-foreground mb-1">
+            {car.tagline}
+          </div>
+          <div className="font-display text-3xl md:text-5xl font-black tracking-wider text-glow-red">
+            {car.name.toUpperCase()}
+          </div>
           <div className="mt-2 flex flex-wrap gap-3 text-[10px] tracking-widest text-muted-foreground">
-            <span><span className="text-primary">{car.specs.power}</span> POTÊNCIA</span>
-            <span><span className="text-primary">{car.specs.topSpeed}</span> MAX</span>
+            <span>
+              <span className="text-primary">{car.specs.power}</span> POTÊNCIA
+            </span>
+            <span>
+              <span className="text-primary">{car.specs.topSpeed}</span> MAX
+            </span>
           </div>
         </div>
       </div>
@@ -198,10 +298,32 @@ function CarSquareCard({ car, index, onClick }: any) {
   );
 }
 
-function ImageCard({ to, num, title, sub, cta, img }: { to: string; num: string; title: string; sub: string; cta: string; img: string }) {
+function ImageCard({
+  to,
+  num,
+  title,
+  sub,
+  cta,
+  img,
+}: {
+  to: string;
+  num: string;
+  title: string;
+  sub: string;
+  cta: string;
+  img: string;
+}) {
   return (
-    <Link to={to} className="group relative aspect-square border border-border bg-card hover:border-primary transition overflow-hidden">
-      <img src={img} alt={title} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition duration-700" />
+    <Link
+      to={to}
+      className="group relative aspect-square border border-border bg-card hover:border-primary transition overflow-hidden"
+    >
+      <img
+        src={img}
+        alt={title}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition duration-700"
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="relative h-full flex flex-col justify-between p-6">
@@ -210,7 +332,9 @@ function ImageCard({ to, num, title, sub, cta, img }: { to: string; num: string;
           <div className="font-display text-2xl md:text-3xl font-black tracking-wider">{title}</div>
           <div className="text-xs tracking-widest text-muted-foreground mt-2">{sub}</div>
         </div>
-        <div className="text-[10px] tracking-[0.3em] text-primary group-hover:translate-x-2 transition-transform">{cta}</div>
+        <div className="text-[10px] tracking-[0.3em] text-primary group-hover:translate-x-2 transition-transform">
+          {cta}
+        </div>
       </div>
     </Link>
   );
