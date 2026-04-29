@@ -5,6 +5,9 @@ import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import { playClick, playRev } from "@/lib/engine-sound";
 import heroJesko from "@/assets/hero-jesko.jpg";
+import historyImg from "@/assets/history.jpg";
+import factoryImg from "@/assets/factory.jpg";
+import locationsImg from "@/assets/locations.jpg";
 
 export const Route = createFileRoute("/garage")({
   beforeLoad: () => {
@@ -70,13 +73,13 @@ function Garage() {
             <button
               key={i}
               onClick={() => handleCar(c.id)}
-              className="group relative w-64 md:w-80 h-40 md:h-48 shrink-0 overflow-hidden border border-border hover:border-primary transition"
+              className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition"
             >
               <img src={c.image} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
-                <div className="text-[9px] tracking-[0.3em] text-primary">{c.year}</div>
-                <div className="font-display text-lg tracking-wider">{c.name}</div>
+              <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
+                <div className="text-[8px] tracking-[0.3em] text-primary">{c.year}</div>
+                <div className="font-display text-sm tracking-wider">{c.name}</div>
               </div>
             </button>
           ))}
@@ -100,29 +103,10 @@ function Garage() {
         </div>
 
         {/* About brand & factory */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-          <Link to="/brand" className="group relative aspect-square border border-border bg-card hover:border-primary transition overflow-hidden">
-            <div className="absolute inset-0 bg-grid opacity-30" />
-            <div className="relative h-full flex flex-col justify-between p-6">
-              <div className="text-[10px] tracking-[0.4em] text-primary">/01</div>
-              <div>
-                <div className="font-display text-2xl md:text-3xl font-black tracking-wider">HISTÓRIA</div>
-                <div className="text-xs tracking-widest text-muted-foreground mt-2">DA MARCA</div>
-              </div>
-              <div className="text-[10px] tracking-[0.3em] text-primary group-hover:translate-x-2 transition-transform">DESCOBRIR ▸</div>
-            </div>
-          </Link>
-          <Link to="/factory" className="group relative aspect-square border border-border bg-card hover:border-primary transition overflow-hidden">
-            <div className="absolute inset-0 bg-grid opacity-30" />
-            <div className="relative h-full flex flex-col justify-between p-6">
-              <div className="text-[10px] tracking-[0.4em] text-primary">/02</div>
-              <div>
-                <div className="font-display text-2xl md:text-3xl font-black tracking-wider">FÁBRICA</div>
-                <div className="text-xs tracking-widest text-muted-foreground mt-2">ÄNGELHOLM, SUÉCIA</div>
-              </div>
-              <div className="text-[10px] tracking-[0.3em] text-primary group-hover:translate-x-2 transition-transform">VISITAR ▸</div>
-            </div>
-          </Link>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+          <ImageCard to="/brand" num="/01" title="HISTÓRIA" sub="DA MARCA" cta="DESCOBRIR ▸" img={historyImg} />
+          <ImageCard to="/factory" num="/02" title="FÁBRICA" sub="ÄNGELHOLM, SUÉCIA" cta="VISITAR ▸" img={factoryImg} />
+          <ImageCard to="/locations" num="/03" title="LOCAIS" sub="VENDA · ALUGUEL · MUSEUS" cta="EXPLORAR ▸" img={locationsImg} />
         </div>
       </section>
 
