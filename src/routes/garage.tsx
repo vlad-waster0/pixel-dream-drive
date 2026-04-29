@@ -69,9 +69,6 @@ function Garage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         <div className="absolute inset-0 bg-scanlines pointer-events-none" />
-        <div className="absolute top-4 right-4 text-[10px] tracking-[0.4em] text-white/70 border border-white/30 bg-black/40 backdrop-blur px-3 py-1.5 pointer-events-none">
-          {muted ? "🔇 MUDO · TOQUE P/ SOM" : "🔊 SOM · TOQUE P/ MUDO"}
-        </div>
       </section>
 
       {/* MARQUEE — auto-scrolling cards */}
