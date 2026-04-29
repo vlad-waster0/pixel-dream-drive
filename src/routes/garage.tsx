@@ -93,8 +93,7 @@ function Garage() {
       {/* MARQUEE — auto-scrolling cards */}
       <ScrollHide scrollY={scrollY} strength={1.1}>
         <section className="relative py-10 border-y border-border overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 px-4 md:px-12 pt-2 flex items-center justify-between">
-            <span className="text-[10px] tracking-[0.4em] text-muted-foreground">EM MOVIMENTO</span>
+          <div className="absolute top-0 left-0 right-0 px-4 md:px-12 pt-2 flex items-center justify-end">
             <span className="text-[10px] tracking-[0.4em] text-primary">{cars.length} MODELOS</span>
           </div>
           <div className="flex gap-4 animate-marquee w-max mt-4">
