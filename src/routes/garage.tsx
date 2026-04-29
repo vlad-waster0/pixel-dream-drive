@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { cars, type Car } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
@@ -67,69 +67,60 @@ function Garage() {
       <Header />
 
       {/* HERO */}
-      <section
-        className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer"
-        onClick={toggleMute}
-        style={{
-          opacity: Math.max(0, 1 - scrollY / 500),
-          transform: `translateY(${scrollY * 0.5}px) scale(${Math.max(0.85, 1 - scrollY / 2000)})`,
-          filter: `blur(${Math.min(8, scrollY / 80)}px)`,
-          willChange: "transform, opacity, filter",
-        }}
-      >
-        <div className="absolute inset-0 bg-grid opacity-20" />
-        <div
-          className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}
+      <ScrollHide scrollY={scrollY} strength={1.25}>
+        <section
+          className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer"
+          onClick={toggleMute}
         >
-          <video
-            ref={videoRef}
-            src={introVideo}
-            autoPlay
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-        <div className="absolute inset-0 bg-scanlines pointer-events-none" />
-      </section>
+          <div className="absolute inset-0 bg-grid opacity-20" />
+          <div
+            className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}
+          >
+            <video
+              ref={videoRef}
+              src={introVideo}
+              autoPlay
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+          <div className="absolute inset-0 bg-scanlines pointer-events-none" />
+        </section>
+      </ScrollHide>
 
       {/* MARQUEE — auto-scrolling cards */}
-      <section
-        className="relative py-10 border-y border-border overflow-hidden"
-        style={{
-          opacity: Math.max(0, 1 - Math.max(0, scrollY - 200) / 400),
-          transform: `translateY(${Math.max(0, scrollY - 200) * 0.3}px)`,
-          willChange: "transform, opacity",
-        }}
-      >
-        <div className="absolute top-0 left-0 right-0 px-4 md:px-12 pt-2 flex items-center justify-between">
-          <span className="text-[10px] tracking-[0.4em] text-muted-foreground">EM MOVIMENTO</span>
-          <span className="text-[10px] tracking-[0.4em] text-primary">{cars.length} MODELOS</span>
-        </div>
-        <div className="flex gap-4 animate-marquee w-max mt-4">
-          {[...cars, ...cars].map((c, i) => (
-            <button
-              key={i}
-              onClick={() => handleCar(c.id)}
-              className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition bg-black"
-            >
-              <img
-                src={c.image}
-                alt={c.name}
-                loading="eager"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-contain p-1 transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
-                <div className="text-[8px] tracking-[0.3em] text-primary">{c.year}</div>
-                <div className="font-display text-sm tracking-wider">{c.name}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+      <ScrollHide scrollY={scrollY} strength={1.1}>
+        <section className="relative py-10 border-y border-border overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 px-4 md:px-12 pt-2 flex items-center justify-between">
+            <span className="text-[10px] tracking-[0.4em] text-muted-foreground">EM MOVIMENTO</span>
+            <span className="text-[10px] tracking-[0.4em] text-primary">{cars.length} MODELOS</span>
+          </div>
+          <div className="flex gap-4 animate-marquee w-max mt-4">
+            {[...cars, ...cars].map((c, i) => (
+              <button
+                key={i}
+                onClick={() => handleCar(c.id)}
+                className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition bg-black"
+              >
+                <img
+                  src={c.image}
+                  alt={c.name}
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-contain p-1 transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
+                  <div className="text-[8px] tracking-[0.3em] text-primary">{c.year}</div>
+                  <div className="font-display text-sm tracking-wider">{c.name}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      </ScrollHide>
 
       {/* GRID — square cards stacked */}
       <section className="max-w-3xl mx-auto px-4 md:px-8 py-10">
