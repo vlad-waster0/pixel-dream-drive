@@ -152,3 +152,21 @@ function CarSquareCard({ car, index, onClick }: any) {
     </button>
   );
 }
+
+function ImageCard({ to, num, title, sub, cta, img }: { to: string; num: string; title: string; sub: string; cta: string; img: string }) {
+  return (
+    <Link to={to} className="group relative aspect-square border border-border bg-card hover:border-primary transition overflow-hidden">
+      <img src={img} alt={title} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="relative h-full flex flex-col justify-between p-6">
+        <div className="text-[10px] tracking-[0.4em] text-primary">{num}</div>
+        <div>
+          <div className="font-display text-2xl md:text-3xl font-black tracking-wider">{title}</div>
+          <div className="text-xs tracking-widest text-muted-foreground mt-2">{sub}</div>
+        </div>
+        <div className="text-[10px] tracking-[0.3em] text-primary group-hover:translate-x-2 transition-transform">{cta}</div>
+      </div>
+    </Link>
+  );
+}
