@@ -30,12 +30,12 @@ const COLORS = [
 ];
 
 const PARTS = [
-  { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO" },
-  { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON" },
-  { img: steeringImg, name: "VOLANTE", spec: "CARBONO" },
-  { img: wingImg, name: "AILERON", spec: "AERO ATIVA" },
-  { img: gearboxImg, name: "CÂMBIO", spec: "LST 9-VEL" },
-  { img: brakeImg, name: "FREIO", spec: "CARBO-CERÂMICO" },
+  { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO", info: "Motor V8 5.0L biturbo desenvolvido inteiramente in-house. Bloco em alumínio fundido, virabrequim plano (flat-plane crank) e capacidade de operar com gasolina ou etanol E85, dobrando a potência no biocombustível." },
+  { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON", info: "Tecnologia exclusiva da Koenigsegg: roda monobloco em fibra de carbono oca por dentro, pesando até 40% menos que rodas forjadas de alumínio. Reduz massa não-suspensa e melhora tudo." },
+  { img: steeringImg, name: "VOLANTE", spec: "CARBONO", info: "Volante de fibra de carbono com display SmartCenter integrado, controles de aileron, modos de condução e launch control. Quick-release, removível para entrar e sair." },
+  { img: wingImg, name: "AILERON", spec: "AERO ATIVA", info: "Aerofólio ativo controlado eletronicamente. Reduz arrasto em alta velocidade, ajusta downforce em curvas e atua como freio aerodinâmico ao desacelerar bruscamente." },
+  { img: gearboxImg, name: "CÂMBIO", spec: "LST 9-VEL", info: "Light Speed Transmission: caixa de 9 marchas com 7 embreagens que permite trocas instantâneas para qualquer marcha — sem pular sequencialmente. Mais leve que uma transmissão tradicional de 7 marchas." },
+  { img: brakeImg, name: "FREIO", spec: "CARBO-CERÂMICO", info: "Discos cerâmicos de carbono ventilados com pinças de 6 pistões na frente e 4 atrás. Resistentes a fade extremo — frenagem repetida acima de 300 km/h sem perda de performance." },
 ];
 
 function CarPage() {
@@ -44,6 +44,7 @@ function CarPage() {
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
   const [animKey, setAnimKey] = useState(0);
+  const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
   const pendingColor = COLORS[pendingIdx];
@@ -78,28 +79,17 @@ function CarPage() {
 
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-scan" />
 
-          {/* Car image with drive-by animation on color change */}
-          <div key={animKey} className="absolute inset-0 flex items-center justify-center">
-            <img
-              src={car.image}
-              alt={car.fullName}
-              className="w-full h-full object-cover animate-drive-by"
-              style={{ filter: currentColor.filter }}
-            />
-          </div>
-
-          {/* Static current image once animation done */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ animation: "none" }}>
-            <img
-              src={car.image}
-              alt=""
-              aria-hidden
-              className="w-full h-full object-cover opacity-0"
-              style={{ filter: currentColor.filter, animation: `fadeIn 0.4s ${1.4}s ease-out forwards` }}
-            />
-          </div>
+          {/* Car image — light off / on swap on color change */}
+          <img
+            key={animKey}
+            src={car.image}
+            alt={car.fullName}
+            className="absolute inset-0 w-full h-full object-cover animate-light-swap"
+            style={{ filter: currentColor.filter }}
+          />
+          {/* dark veil that flickers with the car */}
+          <div key={`veil-${animKey}`} className="absolute inset-0 bg-black pointer-events-none" style={{ animation: "lightVeil 1.8s cubic-bezier(0.4,0,0.6,1) forwards" }} />
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
@@ -196,11 +186,17 @@ function CarPage() {
       {/* PARTS — FLOATING */}
       <section className="max-w-6xl mx-auto px-4 md:px-8 mt-12">
         <SectionHeader num="03" title="COMPONENTES" />
+        <div className="text-[10px] tracking-[0.3em] text-muted-foreground mt-2">CLIQUE EM CADA PEÇA</div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
           {PARTS.map((p, i) => (
-            <div key={p.name} className="relative aspect-square border border-border bg-card overflow-hidden group">
+            <button
+              key={p.name}
+              type="button"
+              onClick={() => { playClick(); setOpenPart(openPart === i ? null : i); }}
+              className="relative aspect-square border border-border bg-card overflow-hidden group text-left hover:border-primary transition"
+            >
               <div className="absolute inset-0 bg-grid opacity-30" />
-              <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent" style={{ background: "radial-gradient(circle at center, oklch(0.58 0.24 25 / 0.15), transparent 70%)" }} />
+              <div className="absolute inset-0" style={{ background: "radial-gradient(circle at center, oklch(0.58 0.24 25 / 0.15), transparent 70%)" }} />
               <img
                 src={p.img}
                 alt={p.name}
@@ -208,14 +204,34 @@ function CarPage() {
                 className="absolute inset-0 m-auto w-3/4 h-3/4 object-contain animate-float-part"
                 style={{ animationDelay: `${i * 0.4}s`, mixBlendMode: "screen" }}
               />
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background via-background/80 to-transparent">
                 <div className="font-display text-sm tracking-widest">{p.name}</div>
                 <div className="text-[9px] tracking-[0.3em] text-primary">{p.spec}</div>
               </div>
               <div className="absolute top-2 right-2 text-[9px] tracking-[0.3em] text-muted-foreground">/{String(i+1).padStart(2,"0")}</div>
-            </div>
+            </button>
           ))}
         </div>
+
+        {openPart !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur" onClick={() => setOpenPart(null)}>
+            <div className="relative max-w-md w-full border border-primary bg-card p-6 animate-glitch-in" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-primary" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-primary" />
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l-2 border-b-2 border-primary" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-r-2 border-b-2 border-primary" />
+              <div className="flex gap-4">
+                <img src={PARTS[openPart].img} alt="" className="w-24 h-24 object-contain shrink-0" style={{ mixBlendMode: "screen" }} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] tracking-[0.3em] text-primary">{PARTS[openPart].spec}</div>
+                  <div className="font-display text-xl tracking-wider mt-1">{PARTS[openPart].name}</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{PARTS[openPart].info}</p>
+              <button onClick={() => setOpenPart(null)} className="mt-5 w-full py-2 bg-primary text-primary-foreground text-[10px] tracking-[0.3em]">FECHAR</button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* HISTORY */}
@@ -232,7 +248,15 @@ function CarPage() {
         <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG · {car.fullName.toUpperCase()}</div>
       </footer>
 
-      <style>{`@keyframes fadeIn { to { opacity: 1; } }`}</style>
+      <style>{`
+        @keyframes lightVeil {
+          0% { opacity: 0; }
+          20% { opacity: 0.95; }
+          50% { opacity: 0.85; }
+          60% { opacity: 0.95; }
+          100% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
