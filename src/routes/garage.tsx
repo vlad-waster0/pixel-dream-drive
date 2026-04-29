@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
-import { playClick, playRev } from "@/lib/engine-sound";
 import historyImg from "@/assets/history.jpg";
 import factoryImg from "@/assets/factory.jpg";
 import locationsImg from "@/assets/locations.jpg";
