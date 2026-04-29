@@ -29,6 +29,18 @@ const COLORS = [
   { name: "EMERALD", hex: "#0f7a3d", filter: "hue-rotate(120deg) saturate(1.3)" },
 ];
 
+// Accent (stripes/details) — overlay via mix-blend-mode
+const ACCENTS = [
+  { name: "OFF", hex: "transparent" },
+  { name: "ELECTRIC", hex: "#3b82f6" },
+  { name: "YELLOW", hex: "#facc15" },
+  { name: "RED", hex: "#ef4444" },
+  { name: "LIME", hex: "#84cc16" },
+  { name: "MAGENTA", hex: "#ec4899" },
+  { name: "ORANGE", hex: "#f97316" },
+  { name: "WHITE", hex: "#ffffff" },
+];
+
 const PARTS = [
   { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO", info: "Motor V8 5.0L biturbo desenvolvido inteiramente in-house. Bloco em alumínio fundido, virabrequim plano (flat-plane crank) e capacidade de operar com gasolina ou etanol E85, dobrando a potência no biocombustível." },
   { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON", info: "Tecnologia exclusiva da Koenigsegg: roda monobloco em fibra de carbono oca por dentro, pesando até 40% menos que rodas forjadas de alumínio. Reduz massa não-suspensa e melhora tudo." },
@@ -43,10 +55,12 @@ function CarPage() {
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
+  const [accentIdx, setAccentIdx] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
   const pendingColor = COLORS[pendingIdx];
+  const currentAccent = ACCENTS[accentIdx];
 
   const applyColor = (nextIdx: number) => {
     setPendingIdx(nextIdx);
@@ -91,9 +105,20 @@ function CarPage() {
             alt={car.fullName}
             loading="eager"
             decoding="async"
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
             className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
             style={{ filter: currentColor.filter }}
           />
+
+          {/* Accent tint overlay */}
+          {currentAccent.hex !== "transparent" && (
+            <div
+              className="absolute inset-0 pointer-events-none transition-[background-color,opacity] duration-500"
+              style={{ backgroundColor: currentAccent.hex, mixBlendMode: "color", opacity: 0.45 }}
+            />
+          )}
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
