@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as GarageRouteImport } from './routes/garage'
 import { Route as FactoryRouteImport } from './routes/factory'
+import { Route as CreatorRouteImport } from './routes/creator'
 import { Route as BrandRouteImport } from './routes/brand'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarIdRouteImport } from './routes/car.$id'
@@ -37,6 +38,11 @@ const FactoryRoute = FactoryRouteImport.update({
   path: '/factory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorRoute = CreatorRouteImport.update({
+  id: '/creator',
+  path: '/creator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BrandRoute = BrandRouteImport.update({
   id: '/brand',
   path: '/brand',
@@ -56,6 +62,7 @@ const CarIdRoute = CarIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
+  '/creator': typeof CreatorRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
   '/locations': typeof LocationsRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
+  '/creator': typeof CreatorRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
   '/locations': typeof LocationsRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
+  '/creator': typeof CreatorRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
   '/locations': typeof LocationsRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/brand'
+    | '/creator'
     | '/factory'
     | '/garage'
     | '/locations'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/brand'
+    | '/creator'
     | '/factory'
     | '/garage'
     | '/locations'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/brand'
+    | '/creator'
     | '/factory'
     | '/garage'
     | '/locations'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BrandRoute: typeof BrandRoute
+  CreatorRoute: typeof CreatorRoute
   FactoryRoute: typeof FactoryRoute
   GarageRoute: typeof GarageRoute
   LocationsRoute: typeof LocationsRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FactoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creator': {
+      id: '/creator'
+      path: '/creator'
+      fullPath: '/creator'
+      preLoaderRoute: typeof CreatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/brand': {
       id: '/brand'
       path: '/brand'
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BrandRoute: BrandRoute,
+  CreatorRoute: CreatorRoute,
   FactoryRoute: FactoryRoute,
   GarageRoute: GarageRoute,
   LocationsRoute: LocationsRoute,
