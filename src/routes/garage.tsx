@@ -4,10 +4,10 @@ import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import { playClick, playRev } from "@/lib/engine-sound";
-import heroJesko from "@/assets/hero-jesko.jpg";
 import historyImg from "@/assets/history.jpg";
 import factoryImg from "@/assets/factory.jpg";
 import locationsImg from "@/assets/locations.jpg";
+import introVideo from "@/assets/intro.mp4";
 
 export const Route = createFileRoute("/garage")({
   beforeLoad: () => {
@@ -18,13 +18,11 @@ export const Route = createFileRoute("/garage")({
 
 function Garage() {
   const navigate = useNavigate();
-  const [headlights, setHeadlights] = useState(false);
   const [heroIn, setHeroIn] = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroIn(true), 100);
-    const t2 = setTimeout(() => setHeadlights(true), 1400);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => { clearTimeout(t1); };
   }, []);
 
   const handleCar = (id: string) => {
@@ -40,14 +38,17 @@ function Garage() {
       <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-20" />
         <div className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}>
-          <img src={heroJesko} alt="Koenigsegg" className="w-full h-full object-cover" />
-          {/* Headlight flares */}
-          <div className={`absolute left-[14%] top-[55%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-white blur-3xl ${headlights ? "animate-headlight" : "opacity-0"}`} />
-          <div className={`absolute right-[14%] top-[55%] w-24 h-24 md:w-44 md:h-44 rounded-full bg-primary blur-3xl ${headlights ? "animate-headlight" : "opacity-0"}`} style={{ animationDelay: "0.3s" }} />
+          <video
+            src={introVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         <div className="absolute inset-0 bg-scanlines pointer-events-none" />
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-scan" />
 
         <div className="absolute inset-x-0 bottom-0 px-4 md:px-12 pb-12">
           <div className={`transition-all duration-1000 delay-500 ${heroIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
@@ -73,9 +74,9 @@ function Garage() {
             <button
               key={i}
               onClick={() => handleCar(c.id)}
-              className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition"
+              className="group relative w-40 md:w-56 h-24 md:h-32 shrink-0 overflow-hidden border border-border hover:border-primary transition bg-black"
             >
-              <img src={c.image} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <img src={c.image} alt={c.name} loading="eager" decoding="async" className="absolute inset-0 w-full h-full object-contain p-1 transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
                 <div className="text-[8px] tracking-[0.3em] text-primary">{c.year}</div>
@@ -125,7 +126,7 @@ function CarSquareCard({ car, index, onClick }: any) {
       className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed ? "scale-95 brightness-150" : ""}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <img src={car.image} alt={car.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+      <img src={car.image} alt={car.name} loading="eager" decoding="async" className="absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       <div className="absolute inset-0 bg-scanlines opacity-20" />
 
