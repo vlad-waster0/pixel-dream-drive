@@ -4,6 +4,10 @@ import { getUser } from "@/lib/auth";
 import factoryImg from "@/assets/factory.jpg";
 import historyImg from "@/assets/history.jpg";
 import heroJesko from "@/assets/hero-jesko.jpg";
+import factoryInside from "@/assets/factory-inside-1.jpg";
+import factoryEngine from "@/assets/factory-engine.jpg";
+import factoryCarbon from "@/assets/factory-carbon.jpg";
+import factoryRunway from "@/assets/factory-runway.jpg";
 
 export const Route = createFileRoute("/factory")({
   beforeLoad: () => { if (typeof window !== "undefined" && !getUser()) throw redirect({ to: "/login" }); },
@@ -35,6 +39,22 @@ function FactoryPage() {
           A fábrica fica numa antiga base da Força Aérea Sueca, no sul da Suécia. A pista de pouso adjacente é usada para testes de velocidade dos hipercarros.
         </Card>
 
+        <Card label="POR DENTRO" title="LINHA DE MONTAGEM" img={factoryInside}>
+          A fábrica ocupa cerca de 22.000 m² divididos entre montagem, P&D, sala limpa de fibra de carbono, dinamômetros e showroom. Apenas ~40 carros saem da linha por ano — cada um construído em uma estação fixa, do início ao fim.
+        </Card>
+
+        <Card label="MOTORES" title="MONTAGEM ARTESANAL" img={factoryEngine}>
+          Os motores V8 biturbo de 5.0L são montados à mão, peça por peça. Capazes de gerar mais de 1600 cv com etanol E85, são desenvolvidos internamente — bloco, virabrequim e cabeçotes em alumínio com componentes em titânio e Inconel.
+        </Card>
+
+        <Card label="FIBRA DE CARBONO" title="SALA LIMPA" img={factoryCarbon}>
+          Toda a estrutura monocoque e a carroceria são produzidas internamente em fibra de carbono pré-impregnada. O processo acontece em sala limpa com temperatura controlada e cura em autoclave a alta pressão.
+        </Card>
+
+        <Card label="PISTA DE TESTES" title="447 KM/H AQUI" img={factoryRunway}>
+          A antiga pista da F10 Skånska Flygflottilj tem 2.000 m de extensão. É nela que cada carro é validado antes da entrega — e onde recordes mundiais foram cravados ao longo dos anos.
+        </Card>
+
         <Card label="PRIMEIRO CARRO" title="CC8S — 2002" img={historyImg}>
           Embora a empresa tenha sido fundada em 1994 e o primeiro protótipo apresentado em 1996, o primeiro carro de produção — o CC8S — foi entregue em 2002.
         </Card>
@@ -56,6 +76,10 @@ function FactoryPage() {
           <Stat label="PRIMEIRO CARRO" value="2002" />
           <Stat label="PAÍS" value="SUÉCIA" />
           <Stat label="CIDADE" value="ÄNGELHOLM" />
+          <Stat label="ÁREA" value="22.000 m²" />
+          <Stat label="CARROS / ANO" value="~40" />
+          <Stat label="HORAS / CARRO" value="4000 H" />
+          <Stat label="PISTA TESTE" value="2.000 M" />
         </div>
 
         <Link to="/garage" className="block border border-border hover:border-primary transition p-5">

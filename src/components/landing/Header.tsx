@@ -15,6 +15,8 @@ export function Header() {
           <Link to="/garage" className="hover:text-primary transition" activeProps={{ className: "text-primary" }}>GARAGEM</Link>
           <Link to="/brand" className="hover:text-primary transition" activeProps={{ className: "text-primary" }}>HISTÓRIA</Link>
           <Link to="/factory" className="hover:text-primary transition" activeProps={{ className: "text-primary" }}>FÁBRICA</Link>
+          <Link to="/locations" className="hover:text-primary transition" activeProps={{ className: "text-primary" }}>LOCAIS</Link>
+          <Link to="/creator" className="hover:text-primary transition" activeProps={{ className: "text-primary" }}>CRIADOR</Link>
         </nav>
         <div className="flex items-center gap-3 text-[10px] tracking-[0.2em]">
           <span className="hidden sm:inline text-muted-foreground">{user?.name?.toUpperCase()}</span>
