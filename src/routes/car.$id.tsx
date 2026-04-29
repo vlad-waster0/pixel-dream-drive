@@ -49,6 +49,14 @@ function CarPage() {
   const currentColor = COLORS[colorIdx];
   const pendingColor = COLORS[pendingIdx];
 
+  const applyColor = (nextIdx: number) => {
+    setPendingIdx(nextIdx);
+    playClick();
+    if (nextIdx === colorIdx) return;
+    setColorIdx(nextIdx);
+    setAnimKey((k) => k + 1);
+  };
+
   const confirmColor = () => {
     if (pendingIdx === colorIdx) return;
     playRev(2.2);
@@ -86,7 +94,7 @@ function CarPage() {
             src={car.image}
             alt={car.fullName}
             className="absolute inset-0 w-full h-full object-cover animate-light-swap"
-            style={{ filter: currentColor.filter }}
+            style={{ "--car-color-filter": currentColor.filter } as React.CSSProperties}
           />
           {/* dark veil that flickers with the car */}
           <div key={`veil-${animKey}`} className="absolute inset-0 bg-black pointer-events-none" style={{ animation: "lightVeil 1.8s cubic-bezier(0.4,0,0.6,1) forwards" }} />
@@ -106,7 +114,7 @@ function CarPage() {
               max={COLORS.length - 1}
               step={1}
               value={pendingIdx}
-              onChange={(e) => { setPendingIdx(Number(e.target.value)); playClick(); }}
+              onChange={(e) => applyColor(Number(e.target.value))}
               className="vertical-slider"
               style={{
                 writingMode: "vertical-lr" as any,
@@ -137,7 +145,7 @@ function CarPage() {
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">PALETA:</span>
           {COLORS.map((c, i) => (
-            <button key={c.name} onClick={() => { setPendingIdx(i); playClick(); }} className={`w-6 h-6 rounded-full border-2 transition ${pendingIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
+            <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${pendingIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
           ))}
         </div>
       </section>
