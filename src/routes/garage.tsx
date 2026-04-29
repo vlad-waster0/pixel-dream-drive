@@ -20,6 +20,7 @@ function Garage() {
   const [heroIn, setHeroIn] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [muted, setMuted] = useState(false);
+  const [zoomCar, setZoomCar] = useState<any | null>(null);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -104,7 +105,7 @@ function Garage() {
 
         <div className="space-y-4">
           {cars.map((c, i) => (
-            <CarSquareCard key={c.id} car={c} index={i} onClick={() => handleCar(c.id)} />
+            <CarSquareCard key={c.id} car={c} index={i} onClick={() => handleCar(c.id)} onZoom={() => setZoomCar(c)} />
           ))}
         </div>
 
@@ -119,46 +120,67 @@ function Garage() {
       <footer className="border-t border-border py-8 text-center">
         <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG AUTOMOTIVE AB · SVERIGE</div>
       </footer>
+
+      {zoomCar && (
+        <div
+          className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4 animate-glitch-in"
+          onClick={() => setZoomCar(null)}
+        >
+          <div className="absolute top-6 right-6 text-[10px] tracking-[0.4em] text-muted-foreground">FECHAR ✕</div>
+          <div className="relative max-w-5xl w-full">
+            <img
+              src={zoomCar.image}
+              alt={zoomCar.name}
+              className="w-full h-auto object-contain max-h-[80vh] no-save"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+            <div className="text-center mt-4">
+              <div className="text-[10px] tracking-[0.4em] text-primary">{zoomCar.year}</div>
+              <div className="font-display text-3xl tracking-widest text-glow-red">{zoomCar.name.toUpperCase()}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function CarSquareCard({ car, index, onClick }: any) {
+function CarSquareCard({ car, index, onClick, onZoom }: any) {
   const [pressed, setPressed] = useState(false);
-  const [zooming, setZooming] = useState(false);
+  const [longPress, setLongPress] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longFiredRef = useRef(false);
+  const triggeredRef = useRef(false);
 
-  const start = () => {
-    longFiredRef.current = false;
-    setPressed(true);
+  const startPress = () => {
+    triggeredRef.current = false;
+    setLongPress(true);
     timerRef.current = setTimeout(() => {
-      longFiredRef.current = true;
-      setZooming(true);
+      triggeredRef.current = true;
+      setLongPress(false);
+      onZoom();
     }, 550);
   };
-  const cancel = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setPressed(false);
-    setZooming(false);
+  const cancelPress = () => {
+    setLongPress(false);
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
   };
-  const end = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setPressed(false);
-    setZooming(false);
-    if (!longFiredRef.current) {
-      setTimeout(onClick, 100);
-    }
+  const handleClick = () => {
+    if (triggeredRef.current) return;
+    setPressed(true);
+    setTimeout(onClick, 250);
   };
 
   return (
     <button
-      onPointerDown={start}
-      onPointerUp={end}
-      onPointerLeave={cancel}
-      onPointerCancel={cancel}
+      onClick={handleClick}
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
       onContextMenu={(e) => e.preventDefault()}
-      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed && !zooming ? "scale-95 brightness-150" : ""}`}
+      className={`group relative w-full aspect-square overflow-hidden border border-border hover:border-primary bg-card transition-all duration-300 ${pressed ? "scale-95 brightness-150" : ""} ${longPress ? "scale-[1.04]" : ""}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <img
@@ -169,7 +191,7 @@ function CarSquareCard({ car, index, onClick }: any) {
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
         onContextMenu={(e) => e.preventDefault()}
-        className={`no-save absolute inset-0 w-full h-full object-contain p-2 transition-transform ease-out ${zooming ? "scale-[1.6] duration-500" : "duration-700 group-hover:scale-105"}`}
+        className={`no-save absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105 ${longPress ? "scale-125" : ""}`}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       <div className="absolute inset-0 bg-scanlines opacity-20" />
