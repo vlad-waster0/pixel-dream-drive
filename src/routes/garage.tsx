@@ -21,6 +21,13 @@ function Garage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [muted, setMuted] = useState(false);
   const [zoomCar, setZoomCar] = useState<Car | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -63,6 +70,12 @@ function Garage() {
       <section
         className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer"
         onClick={toggleMute}
+        style={{
+          opacity: Math.max(0, 1 - scrollY / 500),
+          transform: `translateY(${scrollY * 0.5}px) scale(${Math.max(0.85, 1 - scrollY / 2000)})`,
+          filter: `blur(${Math.min(8, scrollY / 80)}px)`,
+          willChange: "transform, opacity, filter",
+        }}
       >
         <div className="absolute inset-0 bg-grid opacity-20" />
         <div
@@ -82,7 +95,14 @@ function Garage() {
       </section>
 
       {/* MARQUEE — auto-scrolling cards */}
-      <section className="relative py-10 border-y border-border overflow-hidden">
+      <section
+        className="relative py-10 border-y border-border overflow-hidden"
+        style={{
+          opacity: Math.max(0, 1 - Math.max(0, scrollY - 200) / 400),
+          transform: `translateY(${Math.max(0, scrollY - 200) * 0.3}px)`,
+          willChange: "transform, opacity",
+        }}
+      >
         <div className="absolute top-0 left-0 right-0 px-4 md:px-12 pt-2 flex items-center justify-between">
           <span className="text-[10px] tracking-[0.4em] text-muted-foreground">EM MOVIMENTO</span>
           <span className="text-[10px] tracking-[0.4em] text-primary">{cars.length} MODELOS</span>
