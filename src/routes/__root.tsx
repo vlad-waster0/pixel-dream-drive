@@ -24,6 +24,13 @@ export const Route = createRootRoute({
       { name: "description", content: "Absolut" },
       { property: "og:title", content: "Koenigsegg Jesko" },
       { property: "og:site_name", content: "Absolut" },
+      { name: "twitter:title", content: "Koenigsegg Jesko" },
+      { property: "og:description", content: "Absolut" },
+      { name: "twitter:description", content: "Absolut" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c707d2b9-c514-484b-88a7-f10e2f6e00ea/id-preview-5bec6634--8136f31d-184a-441a-9e8b-f4b7955d8010.lovable.app-1777468077269.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c707d2b9-c514-484b-88a7-f10e2f6e00ea/id-preview-5bec6634--8136f31d-184a-441a-9e8b-f4b7955d8010.lovable.app-1777468077269.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
