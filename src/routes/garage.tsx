@@ -20,6 +20,25 @@ function Garage() {
   const navigate = useNavigate();
   const [heroIn, setHeroIn] = useState(false);
   const [zoomCar, setZoomCar] = useState<any | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [muted, setMuted] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = false;
+    v.volume = 1;
+    const p = v.play();
+    if (p) p.catch(() => { v.muted = true; setMuted(true); v.play().catch(() => {}); });
+  }, []);
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+    if (!v.muted && v.paused) v.play().catch(() => {});
+  };
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroIn(true), 100);
@@ -36,20 +55,23 @@ function Garage() {
       <Header />
 
       {/* HERO */}
-      <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
+      <section className="relative h-[70vh] md:h-[85vh] overflow-hidden cursor-pointer" onClick={toggleMute}>
         <div className="absolute inset-0 bg-grid opacity-20" />
         <div className={`absolute inset-0 transition-all duration-[1800ms] ease-out ${heroIn ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}>
           <video
+            ref={videoRef}
             src={introVideo}
             autoPlay
             loop
-            muted
             playsInline
             className="w-full h-full object-cover"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         <div className="absolute inset-0 bg-scanlines pointer-events-none" />
+        <div className="absolute top-4 right-4 text-[10px] tracking-[0.4em] text-white/70 border border-white/30 bg-black/40 backdrop-blur px-3 py-1.5 pointer-events-none">
+          {muted ? "🔇 MUDO · TOQUE P/ SOM" : "🔊 SOM · TOQUE P/ MUDO"}
+        </div>
       </section>
 
       {/* MARQUEE — auto-scrolling cards */}
