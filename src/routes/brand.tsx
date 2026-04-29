@@ -2,6 +2,8 @@ import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import heroJesko from "@/assets/hero-jesko.jpg";
+import historyImg from "@/assets/history.jpg";
+import factoryImg from "@/assets/factory.jpg";
 
 export const Route = createFileRoute("/brand")({
   beforeLoad: () => { if (typeof window !== "undefined" && !getUser()) throw redirect({ to: "/login" }); },
@@ -10,15 +12,15 @@ export const Route = createFileRoute("/brand")({
 });
 
 const TIMELINE = [
-  { year: "1994", title: "FUNDAÇÃO", text: "Christian von Koenigsegg, aos 22 anos, funda a Koenigsegg Automotive AB em Olofström com a missão de construir o melhor hipercarro do mundo." },
-  { year: "1996", title: "PRIMEIRO PROTÓTIPO", text: "Apresentação do CC Prototype no Cannes Festival, definindo as bases do que viria a ser a marca." },
-  { year: "2000", title: "MUDANÇA PARA ÄNGELHOLM", text: "A empresa muda-se para um antigo hangar da Força Aérea Sueca em Ängelholm — base operacional até hoje." },
-  { year: "2002", title: "CC8S", text: "Primeiro carro de produção. 6 unidades construídas. Estreia oficial em Genebra." },
-  { year: "2005", title: "RECORDE MUNDIAL", text: "O CCR atinge 387,87 km/h em Nardò, batendo o recorde do McLaren F1." },
-  { year: "2014", title: "ONE:1 MEGACAR", text: "Cunha o termo 'Megacar' com relação 1:1 entre potência e peso — 1 megawatt." },
-  { year: "2017", title: "447 KM/H", text: "O Agera RS atinge 447,19 km/h em Nevada, sendo coroado o carro de produção mais rápido do mundo." },
-  { year: "2020", title: "JESKO & GEMERA", text: "Apresentação do Jesko (foco em pista e velocidade) e do Gemera (primeiro Mega-GT 4 lugares do mundo)." },
-  { year: "2022", title: "CC850", text: "Tributo aos 50 anos de Christian. Reinterpreta o CC8S com tecnologia moderna." },
+  { year: "1994", title: "FUNDAÇÃO", img: historyImg, text: "Christian von Koenigsegg, aos 22 anos, funda a Koenigsegg Automotive AB em Olofström com a missão de construir o melhor hipercarro do mundo." },
+  { year: "1996", title: "PRIMEIRO PROTÓTIPO", img: historyImg, text: "Apresentação do CC Prototype no Cannes Festival, definindo as bases do que viria a ser a marca." },
+  { year: "2000", title: "MUDANÇA PARA ÄNGELHOLM", img: factoryImg, text: "A empresa muda-se para um antigo hangar da Força Aérea Sueca em Ängelholm — base operacional até hoje." },
+  { year: "2002", title: "CC8S", img: historyImg, text: "Primeiro carro de produção. 6 unidades construídas. Estreia oficial em Genebra." },
+  { year: "2005", title: "RECORDE MUNDIAL", img: heroJesko, text: "O CCR atinge 387,87 km/h em Nardò, batendo o recorde do McLaren F1." },
+  { year: "2014", title: "ONE:1 MEGACAR", img: heroJesko, text: "Cunha o termo 'Megacar' com relação 1:1 entre potência e peso — 1 megawatt." },
+  { year: "2017", title: "447 KM/H", img: heroJesko, text: "O Agera RS atinge 447,19 km/h em Nevada, sendo coroado o carro de produção mais rápido do mundo." },
+  { year: "2020", title: "JESKO & GEMERA", img: heroJesko, text: "Apresentação do Jesko (foco em pista e velocidade) e do Gemera (primeiro Mega-GT 4 lugares do mundo)." },
+  { year: "2022", title: "CC850", img: heroJesko, text: "Tributo aos 50 anos de Christian. Reinterpreta o CC8S com tecnologia moderna." },
 ];
 
 function BrandPage() {
@@ -34,7 +36,7 @@ function BrandPage() {
           <div className="text-[10px] tracking-[0.5em] text-primary">EST. 1994</div>
           <h1 className="font-display text-4xl md:text-7xl font-black tracking-widest text-glow-red mt-2">A HISTÓRIA</h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mt-3">
-            Da Suécia para o mundo. Trinta anos redefinindo o que um hipercarro pode ser.
+            <span className="font-display text-foreground tracking-[0.3em]">ÄNGELHOLM</span> · Da Suécia para o mundo. Trinta anos redefinindo o que um hipercarro pode ser.
           </p>
         </div>
       </section>
@@ -47,6 +49,9 @@ function BrandPage() {
               <div className="absolute -left-[80px] top-0 hidden md:block font-display text-3xl text-primary text-glow-red">{item.year}</div>
               <div className="md:hidden text-xs tracking-[0.3em] text-primary mb-1">{item.year}</div>
               <div className="font-display text-xl tracking-wider">{item.title}</div>
+              <div className="mt-3 aspect-[16/9] overflow-hidden border border-border">
+                <img src={item.img} alt={item.title} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-700" />
+              </div>
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{item.text}</p>
             </div>
           ))}
