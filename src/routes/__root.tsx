@@ -44,7 +44,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <body className="notranslate" translate="no">
         {children}
         <Scripts />
+        <NoSaveScript />
       </body>
     </html>
+  );
+}
+
+function NoSaveScript() {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          document.addEventListener('contextmenu', function(e){
+            var t=e.target; if(t && (t.tagName==='IMG' || t.tagName==='VIDEO')) e.preventDefault();
+          });
+          document.addEventListener('dragstart', function(e){
+            var t=e.target; if(t && (t.tagName==='IMG' || t.tagName==='VIDEO')) e.preventDefault();
+          });
+        `,
+      }}
+    />
   );
 }
