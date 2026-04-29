@@ -2,6 +2,8 @@ import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import factoryImg from "@/assets/factory.jpg";
+import historyImg from "@/assets/history.jpg";
+import heroJesko from "@/assets/hero-jesko.jpg";
 
 export const Route = createFileRoute("/factory")({
   beforeLoad: () => { if (typeof window !== "undefined" && !getUser()) throw redirect({ to: "/login" }); },
@@ -29,23 +31,23 @@ function FactoryPage() {
       </section>
 
       <section className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
-        <Card label="LOCALIZAÇÃO" title="ÄNGELHOLM, SUÉCIA">
+        <Card label="LOCALIZAÇÃO" title="ÄNGELHOLM, SUÉCIA" img={factoryImg}>
           A fábrica fica numa antiga base da Força Aérea Sueca, no sul da Suécia. A pista de pouso adjacente é usada para testes de velocidade dos hipercarros.
         </Card>
 
-        <Card label="PRIMEIRO CARRO" title="CC8S — 2002">
+        <Card label="PRIMEIRO CARRO" title="CC8S — 2002" img={historyImg}>
           Embora a empresa tenha sido fundada em 1994 e o primeiro protótipo apresentado em 1996, o primeiro carro de produção — o CC8S — foi entregue em 2002.
         </Card>
 
-        <Card label="PRODUÇÃO" title="ARTESANAL">
+        <Card label="PRODUÇÃO" title="ARTESANAL" img={heroJesko}>
           Cada Koenigsegg é construído à mão por uma pequena equipe de mestres artesãos. O Jesko leva cerca de 4000 horas de trabalho para ser concluído.
         </Card>
 
-        <Card label="PISTA PRÓPRIA">
+        <Card label="PISTA PRÓPRIA" img={factoryImg}>
           A antiga pista de pouso da F10 Skånska Flygflottilj foi convertida em pista de teste — onde Koenigseggs ultrapassam regularmente 400 km/h em testes de calibração.
         </Card>
 
-        <Card label="FUNCIONÁRIOS" title="~500 PESSOAS">
+        <Card label="FUNCIONÁRIOS" title="~500 PESSOAS" img={historyImg}>
           Pequena, ágil, integrada verticalmente. A Koenigsegg fabrica internamente quase tudo — incluindo a maioria das peças do motor, transmissões e componentes de carbono.
         </Card>
 
@@ -65,12 +67,17 @@ function FactoryPage() {
   );
 }
 
-function Card({ label, title, children }: any) {
+function Card({ label, title, children, img }: any) {
   return (
     <div className="border border-border bg-card p-5 md:p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-12 h-px bg-primary" />
       <div className="text-[10px] tracking-[0.4em] text-primary">{label}</div>
       {title && <div className="font-display text-xl md:text-2xl tracking-wider mt-1">{title}</div>}
+      {img && (
+        <div className="mt-3 aspect-[16/9] overflow-hidden border border-border">
+          <img src={img} alt="" loading="lazy" className="w-full h-full object-cover opacity-85" />
+        </div>
+      )}
       <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{children}</p>
     </div>
   );

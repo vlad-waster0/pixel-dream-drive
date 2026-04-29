@@ -30,12 +30,12 @@ const COLORS = [
 ];
 
 const PARTS = [
-  { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO" },
-  { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON" },
-  { img: steeringImg, name: "VOLANTE", spec: "CARBONO" },
-  { img: wingImg, name: "AILERON", spec: "AERO ATIVA" },
-  { img: gearboxImg, name: "CÂMBIO", spec: "LST 9-VEL" },
-  { img: brakeImg, name: "FREIO", spec: "CARBO-CERÂMICO" },
+  { img: engineImg, name: "MOTOR V8", spec: "TWIN-TURBO", info: "Motor V8 5.0L biturbo desenvolvido inteiramente in-house. Bloco em alumínio fundido, virabrequim plano (flat-plane crank) e capacidade de operar com gasolina ou etanol E85, dobrando a potência no biocombustível." },
+  { img: wheelImg, name: "RODA", spec: "AIRCORE CARBON", info: "Tecnologia exclusiva da Koenigsegg: roda monobloco em fibra de carbono oca por dentro, pesando até 40% menos que rodas forjadas de alumínio. Reduz massa não-suspensa e melhora tudo." },
+  { img: steeringImg, name: "VOLANTE", spec: "CARBONO", info: "Volante de fibra de carbono com display SmartCenter integrado, controles de aileron, modos de condução e launch control. Quick-release, removível para entrar e sair." },
+  { img: wingImg, name: "AILERON", spec: "AERO ATIVA", info: "Aerofólio ativo controlado eletronicamente. Reduz arrasto em alta velocidade, ajusta downforce em curvas e atua como freio aerodinâmico ao desacelerar bruscamente." },
+  { img: gearboxImg, name: "CÂMBIO", spec: "LST 9-VEL", info: "Light Speed Transmission: caixa de 9 marchas com 7 embreagens que permite trocas instantâneas para qualquer marcha — sem pular sequencialmente. Mais leve que uma transmissão tradicional de 7 marchas." },
+  { img: brakeImg, name: "FREIO", spec: "CARBO-CERÂMICO", info: "Discos cerâmicos de carbono ventilados com pinças de 6 pistões na frente e 4 atrás. Resistentes a fade extremo — frenagem repetida acima de 300 km/h sem perda de performance." },
 ];
 
 function CarPage() {
@@ -44,6 +44,7 @@ function CarPage() {
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
   const [animKey, setAnimKey] = useState(0);
+  const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
   const pendingColor = COLORS[pendingIdx];
@@ -78,28 +79,17 @@ function CarPage() {
 
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-scan" />
 
-          {/* Car image with drive-by animation on color change */}
-          <div key={animKey} className="absolute inset-0 flex items-center justify-center">
-            <img
-              src={car.image}
-              alt={car.fullName}
-              className="w-full h-full object-cover animate-drive-by"
-              style={{ filter: currentColor.filter }}
-            />
-          </div>
-
-          {/* Static current image once animation done */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ animation: "none" }}>
-            <img
-              src={car.image}
-              alt=""
-              aria-hidden
-              className="w-full h-full object-cover opacity-0"
-              style={{ filter: currentColor.filter, animation: `fadeIn 0.4s ${1.4}s ease-out forwards` }}
-            />
-          </div>
+          {/* Car image — light off / on swap on color change */}
+          <img
+            key={animKey}
+            src={car.image}
+            alt={car.fullName}
+            className="absolute inset-0 w-full h-full object-cover animate-light-swap"
+            style={{ filter: currentColor.filter }}
+          />
+          {/* dark veil that flickers with the car */}
+          <div key={`veil-${animKey}`} className="absolute inset-0 bg-black pointer-events-none" style={{ animation: "lightVeil 1.8s cubic-bezier(0.4,0,0.6,1) forwards" }} />
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
@@ -174,20 +164,22 @@ function CarPage() {
       {/* BLUEPRINT / DIMENSIONS */}
       <section className="max-w-6xl mx-auto px-4 md:px-8 mt-12">
         <SectionHeader num="02" title="DIMENSÕES · BLUEPRINT" />
-        <div className="mt-6 border border-border bg-card p-6 md:p-10 relative overflow-hidden">
-          <div className="absolute inset-0 bg-grid opacity-20" />
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
+        <div className="mt-6 border border-white/15 bg-black p-6 md:p-10 relative overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <div className="md:col-span-2">
               <div className="relative aspect-[2/1]">
-                <BlueprintSVG />
+                <BlueprintSVG car={car} />
               </div>
-              <div className="mt-2 text-[10px] tracking-[0.3em] text-muted-foreground text-center">VISTA LATERAL · ESCALA 1:30</div>
+              <div className="mt-2 text-[10px] tracking-[0.3em] text-white/40 text-center">VISTA TÉCNICA · {car.fullName.toUpperCase()}</div>
             </div>
-            <div className="space-y-3">
-              <DimRow label="COMPRIMENTO" value={car.specs.length} />
-              <DimRow label="LARGURA" value={car.specs.width} />
-              <DimRow label="ALTURA" value={car.specs.height} />
-              <DimRow label="ENTRE-EIXOS" value={car.specs.wheelbase} />
+            <div className="space-y-2 border-l border-white/15 md:pl-6">
+              <BpRow label="ANO" value={String(car.year)} />
+              <BpRow label="MOTOR" value={car.specs.engine.split(" ").slice(0,3).join(" ")} />
+              <BpRow label="POTÊNCIA" value={car.specs.power} />
+              <BpRow label="TORQUE" value={car.specs.torque} />
+              <BpRow label="PESO" value={car.specs.weight} />
+              <BpRow label="0-100 KM/H" value={car.specs.acceleration} />
+              <BpRow label="VEL. MÁX" value={car.specs.topSpeed} />
             </div>
           </div>
         </div>
@@ -196,11 +188,17 @@ function CarPage() {
       {/* PARTS — FLOATING */}
       <section className="max-w-6xl mx-auto px-4 md:px-8 mt-12">
         <SectionHeader num="03" title="COMPONENTES" />
+        <div className="text-[10px] tracking-[0.3em] text-muted-foreground mt-2">CLIQUE EM CADA PEÇA</div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
           {PARTS.map((p, i) => (
-            <div key={p.name} className="relative aspect-square border border-border bg-card overflow-hidden group">
+            <button
+              key={p.name}
+              type="button"
+              onClick={() => { playClick(); setOpenPart(openPart === i ? null : i); }}
+              className="relative aspect-square border border-border bg-card overflow-hidden group text-left hover:border-primary transition"
+            >
               <div className="absolute inset-0 bg-grid opacity-30" />
-              <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent" style={{ background: "radial-gradient(circle at center, oklch(0.58 0.24 25 / 0.15), transparent 70%)" }} />
+              <div className="absolute inset-0" style={{ background: "radial-gradient(circle at center, oklch(0.58 0.24 25 / 0.15), transparent 70%)" }} />
               <img
                 src={p.img}
                 alt={p.name}
@@ -208,14 +206,34 @@ function CarPage() {
                 className="absolute inset-0 m-auto w-3/4 h-3/4 object-contain animate-float-part"
                 style={{ animationDelay: `${i * 0.4}s`, mixBlendMode: "screen" }}
               />
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background via-background/80 to-transparent">
                 <div className="font-display text-sm tracking-widest">{p.name}</div>
                 <div className="text-[9px] tracking-[0.3em] text-primary">{p.spec}</div>
               </div>
               <div className="absolute top-2 right-2 text-[9px] tracking-[0.3em] text-muted-foreground">/{String(i+1).padStart(2,"0")}</div>
-            </div>
+            </button>
           ))}
         </div>
+
+        {openPart !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur" onClick={() => setOpenPart(null)}>
+            <div className="relative max-w-md w-full border border-primary bg-card p-6 animate-glitch-in" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-primary" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-primary" />
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l-2 border-b-2 border-primary" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-r-2 border-b-2 border-primary" />
+              <div className="flex gap-4">
+                <img src={PARTS[openPart].img} alt="" className="w-24 h-24 object-contain shrink-0" style={{ mixBlendMode: "screen" }} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] tracking-[0.3em] text-primary">{PARTS[openPart].spec}</div>
+                  <div className="font-display text-xl tracking-wider mt-1">{PARTS[openPart].name}</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{PARTS[openPart].info}</p>
+              <button onClick={() => setOpenPart(null)} className="mt-5 w-full py-2 bg-primary text-primary-foreground text-[10px] tracking-[0.3em]">FECHAR</button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* HISTORY */}
@@ -232,7 +250,15 @@ function CarPage() {
         <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG · {car.fullName.toUpperCase()}</div>
       </footer>
 
-      <style>{`@keyframes fadeIn { to { opacity: 1; } }`}</style>
+      <style>{`
+        @keyframes lightVeil {
+          0% { opacity: 0; }
+          20% { opacity: 0.95; }
+          50% { opacity: 0.85; }
+          60% { opacity: 0.95; }
+          100% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -256,39 +282,66 @@ function Spec({ label, value, highlight }: { label: string; value: string; highl
   );
 }
 
-function DimRow({ label, value }: { label: string; value: string }) {
+function BpRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-border pb-2">
-      <span className="text-[10px] tracking-[0.3em] text-muted-foreground">{label}</span>
-      <span className="font-display text-base text-primary">{value}</span>
+    <div className="flex items-center justify-between py-1.5">
+      <span className="text-[10px] tracking-[0.3em] text-white/50">{label}</span>
+      <span className="font-display text-sm text-white">{value}</span>
     </div>
   );
 }
 
-function BlueprintSVG() {
+function BlueprintSVG({ car }: { car: any }) {
+  // White-on-black technical drawing — side view + dimensions, like the reference.
   return (
-    <svg viewBox="0 0 400 200" className="w-full h-full" stroke="currentColor" fill="none" strokeWidth="1.2">
-      <g className="text-primary">
-        {/* simplified hypercar silhouette */}
-        <path d="M30 140 Q40 130 60 128 L90 110 Q140 90 200 88 Q260 86 310 105 L340 122 Q360 124 370 138 L370 150 L30 150 Z" strokeWidth="1.5" />
-        <circle cx="90" cy="150" r="22" />
-        <circle cx="90" cy="150" r="10" />
-        <circle cx="310" cy="150" r="22" />
-        <circle cx="310" cy="150" r="10" />
-        {/* cockpit */}
-        <path d="M150 90 Q175 70 220 70 Q260 72 280 90" />
+    <svg viewBox="0 0 400 200" className="w-full h-full" stroke="white" fill="none" strokeWidth="1" strokeLinecap="round">
+      {/* Body silhouette */}
+      <g>
+        <path d="M28 142 Q40 132 62 128 L92 108 Q140 86 200 84 Q262 84 312 104 L342 122 Q364 124 374 140 L374 152 L28 152 Z" strokeWidth="1.4" />
+        {/* cockpit / glass */}
+        <path d="M138 108 Q180 70 230 70 Q270 72 296 100" />
+        {/* door line */}
+        <path d="M170 108 L185 145" strokeOpacity="0.6" />
+        <path d="M250 108 L255 145" strokeOpacity="0.6" />
         {/* rear wing */}
-        <path d="M340 90 L370 80 L370 95 L340 100" />
+        <path d="M340 92 L380 84 L380 96 L342 102" />
+        {/* front splitter */}
+        <path d="M28 148 L40 152 L62 152" strokeOpacity="0.6" />
+        {/* wheels */}
+        <circle cx="92" cy="152" r="22" />
+        <circle cx="92" cy="152" r="14" strokeOpacity="0.6" />
+        <circle cx="92" cy="152" r="6" />
+        <circle cx="312" cy="152" r="22" />
+        <circle cx="312" cy="152" r="14" strokeOpacity="0.6" />
+        <circle cx="312" cy="152" r="6" />
+        {/* spokes */}
+        {[0,45,90,135].map((a) => (
+          <g key={a}>
+            <line x1={92 + 6*Math.cos(a*Math.PI/180)} y1={152 + 6*Math.sin(a*Math.PI/180)} x2={92 + 22*Math.cos(a*Math.PI/180)} y2={152 + 22*Math.sin(a*Math.PI/180)} strokeOpacity="0.4" />
+            <line x1={312 + 6*Math.cos(a*Math.PI/180)} y1={152 + 6*Math.sin(a*Math.PI/180)} x2={312 + 22*Math.cos(a*Math.PI/180)} y2={152 + 22*Math.sin(a*Math.PI/180)} strokeOpacity="0.4" />
+          </g>
+        ))}
       </g>
-      <g className="text-muted-foreground" strokeWidth="0.6" strokeDasharray="3 3">
-        <line x1="30" y1="180" x2="370" y2="180" />
-        <line x1="30" y1="175" x2="30" y2="185" />
-        <line x1="370" y1="175" x2="370" y2="185" />
-        <line x1="68" y1="60" x2="332" y2="60" />
+      {/* Dimension lines */}
+      <g strokeOpacity="0.5" strokeWidth="0.5">
+        {/* total length */}
+        <line x1="28" y1="180" x2="374" y2="180" />
+        <line x1="28" y1="176" x2="28" y2="184" />
+        <line x1="374" y1="176" x2="374" y2="184" />
+        {/* wheelbase */}
+        <line x1="92" y1="170" x2="312" y2="170" strokeDasharray="2 2" />
+        <line x1="92" y1="166" x2="92" y2="174" />
+        <line x1="312" y1="166" x2="312" y2="174" />
+        {/* height */}
+        <line x1="14" y1="70" x2="14" y2="152" />
+        <line x1="10" y1="70" x2="18" y2="70" />
+        <line x1="10" y1="152" x2="18" y2="152" />
       </g>
-      <g className="text-muted-foreground" fontSize="7" fontFamily="monospace" fill="currentColor" stroke="none">
-        <text x="195" y="195" textAnchor="middle">L</text>
-        <text x="195" y="55" textAnchor="middle">W</text>
+      <g fontSize="7" fontFamily="ui-monospace, monospace" fill="white" stroke="none" fillOpacity="0.85">
+        <text x="201" y="192" textAnchor="middle">{car.specs.length}</text>
+        <text x="201" y="166" textAnchor="middle" fontSize="6" fillOpacity="0.6">{car.specs.wheelbase}</text>
+        <text x="14" y="65" textAnchor="middle" fontSize="6">{car.specs.height}</text>
+        <text x="200" y="60" textAnchor="middle" fontSize="6" fillOpacity="0.6">{car.specs.width} (largura)</text>
       </g>
     </svg>
   );

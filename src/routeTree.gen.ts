@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as GarageRouteImport } from './routes/garage'
 import { Route as FactoryRouteImport } from './routes/factory'
 import { Route as BrandRouteImport } from './routes/brand'
@@ -19,6 +20,11 @@ import { Route as CarIdRouteImport } from './routes/car.$id'
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GarageRoute = GarageRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/brand': typeof BrandRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
+  '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/car/$id': typeof CarIdRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/brand': typeof BrandRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
+  '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/car/$id': typeof CarIdRoute
 }
@@ -69,20 +77,36 @@ export interface FileRoutesById {
   '/brand': typeof BrandRoute
   '/factory': typeof FactoryRoute
   '/garage': typeof GarageRoute
+  '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/car/$id': typeof CarIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/brand' | '/factory' | '/garage' | '/login' | '/car/$id'
+  fullPaths:
+    | '/'
+    | '/brand'
+    | '/factory'
+    | '/garage'
+    | '/locations'
+    | '/login'
+    | '/car/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/brand' | '/factory' | '/garage' | '/login' | '/car/$id'
+  to:
+    | '/'
+    | '/brand'
+    | '/factory'
+    | '/garage'
+    | '/locations'
+    | '/login'
+    | '/car/$id'
   id:
     | '__root__'
     | '/'
     | '/brand'
     | '/factory'
     | '/garage'
+    | '/locations'
     | '/login'
     | '/car/$id'
   fileRoutesById: FileRoutesById
@@ -92,6 +116,7 @@ export interface RootRouteChildren {
   BrandRoute: typeof BrandRoute
   FactoryRoute: typeof FactoryRoute
   GarageRoute: typeof GarageRoute
+  LocationsRoute: typeof LocationsRoute
   LoginRoute: typeof LoginRoute
   CarIdRoute: typeof CarIdRoute
 }
@@ -103,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/garage': {
@@ -148,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandRoute: BrandRoute,
   FactoryRoute: FactoryRoute,
   GarageRoute: GarageRoute,
+  LocationsRoute: LocationsRoute,
   LoginRoute: LoginRoute,
   CarIdRoute: CarIdRoute,
 }
