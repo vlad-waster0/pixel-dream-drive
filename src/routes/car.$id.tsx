@@ -43,7 +43,6 @@ function CarPage() {
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
   const [colorIdx, setColorIdx] = useState(0);
   const [pendingIdx, setPendingIdx] = useState(0);
-  const [animKey, setAnimKey] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
 
   const currentColor = COLORS[colorIdx];
@@ -54,14 +53,12 @@ function CarPage() {
     playClick();
     if (nextIdx === colorIdx) return;
     setColorIdx(nextIdx);
-    setAnimKey((k) => k + 1);
   };
 
   const confirmColor = () => {
     if (pendingIdx === colorIdx) return;
     playRev(2.2);
     setColorIdx(pendingIdx);
-    setAnimKey((k) => k + 1);
   };
 
   return (
@@ -90,14 +87,13 @@ function CarPage() {
 
           {/* Car image — light off / on swap on color change */}
           <img
-            key={animKey}
             src={car.image}
             alt={car.fullName}
-            className="absolute inset-0 w-full h-full object-cover animate-light-swap"
-            style={{ "--car-color-filter": currentColor.filter } as React.CSSProperties}
+            loading="eager"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
+            style={{ filter: currentColor.filter }}
           />
-          {/* dark veil that flickers with the car */}
-          <div key={`veil-${animKey}`} className="absolute inset-0 bg-black pointer-events-none" style={{ animation: "lightVeil 1.8s cubic-bezier(0.4,0,0.6,1) forwards" }} />
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
@@ -257,16 +253,6 @@ function CarPage() {
       <footer className="border-t border-border py-8 text-center">
         <div className="text-[10px] tracking-[0.4em] text-muted-foreground">KOENIGSEGG · {car.fullName.toUpperCase()}</div>
       </footer>
-
-      <style>{`
-        @keyframes lightVeil {
-          0% { opacity: 0; }
-          20% { opacity: 0.95; }
-          50% { opacity: 0.85; }
-          60% { opacity: 0.95; }
-          100% { opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }
