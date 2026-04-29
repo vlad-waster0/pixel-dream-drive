@@ -2,6 +2,7 @@ import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import creatorImg from "@/assets/creator.jpg";
+import creatorImg2 from "@/assets/creator-2.jpg";
 import factoryImg from "@/assets/factory.jpg";
 import historyImg from "@/assets/history.jpg";
 
@@ -20,7 +21,7 @@ function CreatorPage() {
       <Header />
 
       <section className="relative h-[60vh] overflow-hidden">
-        <img src={creatorImg} alt="Christian von Koenigsegg" className="no-save absolute inset-0 w-full h-full object-cover object-top opacity-80" draggable={false} />
+        <img src={creatorImg} alt="Christian von Koenigsegg" className="no-save absolute inset-0 w-full h-full object-cover object-center opacity-80" draggable={false} />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background" />
         <div className="absolute inset-0 bg-grid opacity-20" />
         <div className="relative h-full flex flex-col justify-end px-4 md:px-12 pb-10">
@@ -33,6 +34,15 @@ function CreatorPage() {
       </section>
 
       <section className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
+        <div className="space-y-3">
+          <div className="aspect-[4/5] overflow-hidden border border-border">
+            <img src={creatorImg} alt="Christian von Koenigsegg sentado em um Koenigsegg" loading="lazy" draggable={false} className="no-save w-full h-full object-cover" />
+          </div>
+          <div className="aspect-[16/9] overflow-hidden border border-border">
+            <img src={creatorImg2} alt="Christian von Koenigsegg na fábrica" loading="lazy" draggable={false} className="no-save w-full h-full object-cover" />
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-px bg-border">
           <Stat label="NASCIMENTO" value="1972" />
           <Stat label="IDADE" value={`${age} ANOS`} />
