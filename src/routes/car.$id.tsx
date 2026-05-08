@@ -21,13 +21,13 @@ export const Route = createFileRoute("/car/$id")({
 
 // Pintura — cor do carro (afeta a imagem inteira)
 const PAINTS = [
-  { name: "BLACK", hex: "#0a0a0a", filter: "brightness(0.7) contrast(1.1)" },
-  { name: "BLOOD", hex: "#c41e3a", filter: "hue-rotate(0deg) saturate(2) brightness(0.85)" },
-  { name: "ARCTIC", hex: "#e8e8e8", filter: "brightness(1.3) saturate(0.3) contrast(0.95)" },
-  { name: "STEEL", hex: "#5a6772", filter: "saturate(0.4) brightness(0.95) hue-rotate(180deg)" },
-  { name: "ROYAL", hex: "#1e3a8a", filter: "hue-rotate(200deg) saturate(1.5)" },
-  { name: "GOLD", hex: "#d4a017", filter: "hue-rotate(40deg) saturate(1.4) brightness(1.1)" },
-  { name: "EMERALD", hex: "#0f7a3d", filter: "hue-rotate(120deg) saturate(1.3)" },
+  { name: "BLOOD", hex: "#c41e3a" },
+  { name: "ARCTIC", hex: "#e8e8e8" },
+  { name: "STEEL", hex: "#5a6772" },
+  { name: "ROYAL", hex: "#1e3a8a" },
+  { name: "GOLD", hex: "#d4a017" },
+  { name: "EMERALD", hex: "#0f7a3d" },
+  { name: "BLACK", hex: "#1a1a1a" },
 ];
 
 // Detalhes — cor de listras/aerofólio/aro (faixa fina sobre o carro, sem brilho)
@@ -98,22 +98,26 @@ function CarPage() {
             draggable={false}
             onDragStart={(e) => e.preventDefault()}
             onContextMenu={(e) => e.preventDefault()}
-            className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
-            style={{ filter: currentPaint.filter }}
+            className="absolute inset-0 w-full h-full object-cover"
           />
 
-          {/* DETALHES — accent tint overlay (color, no glow) */}
+          {/* PINTURA — recolore só o carro (o fundo preto permanece preto com mix-blend color) */}
+          <div
+            className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+            style={{ backgroundColor: currentPaint.hex, mixBlendMode: "color", opacity: 1 }}
+          />
+          {/* reforço de saturação para tons puros */}
+          <div
+            className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+            style={{ backgroundColor: currentPaint.hex, mixBlendMode: "hue", opacity: 0.6 }}
+          />
+
+          {/* DETALHES — só os realces/listras (color-dodge afeta apenas áreas claras) */}
           {currentDetail.hex !== "transparent" && (
-            <>
-              <div
-                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
-                style={{ backgroundColor: currentDetail.hex, mixBlendMode: "multiply", opacity: 0.85 }}
-              />
-              <div
-                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
-                style={{ backgroundColor: currentDetail.hex, mixBlendMode: "color", opacity: 0.55 }}
-              />
-            </>
+            <div
+              className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+              style={{ backgroundColor: currentDetail.hex, mixBlendMode: "color-dodge", opacity: 0.35 }}
+            />
           )}
 
           {/* corners */}
