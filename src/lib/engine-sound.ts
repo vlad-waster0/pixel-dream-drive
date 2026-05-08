@@ -1,4 +1,6 @@
-// Synthetic V8 engine acceleration sound using Web Audio API
+// Realistic engine acceleration synth using Web Audio API.
+// Layered: crankshaft pulses (sawtooth chord), exhaust noise, induction whoosh,
+// turbo whistle, and pop-on-lift. Profile changes the character per car.
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext {
@@ -6,7 +8,24 @@ function getCtx(): AudioContext {
   return ctx;
 }
 
-export function playRev(durationSec = 2.2) {
+export interface EngineProfile {
+  cylinders?: number;     // 4, 6, 8...
+  idleHz?: number;        // base fundamental at idle
+  redlineHz?: number;     // peak fundamental at redline
+  turbo?: boolean;        // adds whistle + blow-off
+  rough?: number;         // 0..1 — engine roughness
+  duration?: number;      // seconds
+}
+
+export function playRev(profile: EngineProfile = {}) {
+  const {
+    cylinders = 8,
+    idleHz = 55,
+    redlineHz = 380,
+    turbo = true,
+    rough = 0.4,
+    duration: durationSec = 2.4,
+  } = profile;
   try {
     const audio = getCtx();
     if (audio.state === "suspended") audio.resume();
