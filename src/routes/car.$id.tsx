@@ -101,7 +101,7 @@ function CarPage() {
 
           {isSketchfab ? (
             <div className="absolute inset-0">
-              <SketchfabViewer modelId={sketchfabId!} title={car.fullName} />
+              <SketchfabViewer modelId={sketchfabId!} title={car.fullName} filter={currentPaint.filter} />
             </div>
           ) : is3D ? (
             <div className="absolute inset-0">
