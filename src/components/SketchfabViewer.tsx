@@ -58,8 +58,10 @@ export function SketchfabViewer({
         allow="autoplay; fullscreen; xr-spatial-tracking"
         allowFullScreen
       />
-      {/* Máscara inferior: esconde apenas a barra de logo do Sketchfab */}
-      <div className="absolute left-0 right-0 bottom-0 h-8 bg-card pointer-events-none" />
+      {/* Máscara inferior: esconde botões e logo do Sketchfab */}
+      <div className="absolute left-0 right-0 bottom-0 h-16 bg-card pointer-events-none" />
+      {/* Máscara lateral superior: esconde botão de share */}
+      <div className="absolute right-0 top-0 w-14 h-14 bg-card pointer-events-none" />
     </div>
   );
 }
