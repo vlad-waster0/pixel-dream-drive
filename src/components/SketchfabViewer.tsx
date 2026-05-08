@@ -53,7 +53,7 @@ export function SketchfabViewer({
         title={`${title} — 360°`}
         src={src}
         className="absolute inset-0 w-full h-full"
-        style={{ filter, transition: "filter 500ms ease-out" }}
+        style={{ filter, transition: "filter 500ms ease-out", transform: "scale(0.92)", transformOrigin: "center center" }}
         frameBorder={0}
         allow="autoplay; fullscreen; xr-spatial-tracking"
         allowFullScreen
