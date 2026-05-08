@@ -114,39 +114,32 @@ function CarPage() {
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
 
-          {/* Turntable — slow workshop rotation */}
-          <div className="absolute inset-0 flex items-center justify-center perspective-1000">
-            <div className="relative w-full h-full animate-turntable">
-              <img
-                src={car.image}
-                alt={car.fullName}
-                loading="eager"
-                decoding="async"
-                draggable={false}
-                onDragStart={(e) => e.preventDefault()}
-                onContextMenu={(e) => e.preventDefault()}
-                className={`absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out ${revving ? "animate-rev" : ""}`}
-                style={{ filter: currentPaint.filter }}
+          {/* Car — slowly rotating like on a workshop turntable. Only the car itself spins. */}
+          <img
+            src={car.image}
+            alt={car.fullName}
+            loading="eager"
+            decoding="async"
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
+            className={`absolute inset-0 w-full h-full object-cover animate-turntable transition-[filter] duration-500 ease-out ${revving ? "animate-rev" : ""}`}
+            style={{ filter: currentPaint.filter }}
+          />
+
+          {/* DETALHES — accent tint overlay (color, no glow) */}
+          {currentDetail.hex !== "transparent" && (
+            <>
+              <div
+                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+                style={{ backgroundColor: currentDetail.hex, mixBlendMode: "multiply", opacity: 0.85 }}
               />
-
-              {/* Detail color — thin racing stripe across the car (color, no glow) */}
-              {currentDetail.hex !== "transparent" && (
-                <>
-                  <div
-                    className="absolute left-0 right-0 top-[42%] h-[6%] pointer-events-none transition-[background-color] duration-500"
-                    style={{ backgroundColor: currentDetail.hex, mixBlendMode: "multiply", opacity: 0.95 }}
-                  />
-                  <div
-                    className="absolute left-0 right-0 top-[49%] h-[2%] pointer-events-none transition-[background-color] duration-500"
-                    style={{ backgroundColor: currentDetail.hex, mixBlendMode: "normal", opacity: 0.7 }}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Workshop turntable platter shadow under the car */}
-          <div className="absolute left-1/2 bottom-3 -translate-x-1/2 w-3/4 h-3 rounded-[50%] bg-black/60 blur-md pointer-events-none" />
+              <div
+                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
+                style={{ backgroundColor: currentDetail.hex, mixBlendMode: "color", opacity: 0.55 }}
+              />
+            </>
+          )}
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
