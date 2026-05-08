@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
-import { playClick } from "@/lib/engine-sound";
+import { playClick, playRev, type EngineProfile } from "@/lib/engine-sound";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -19,7 +19,8 @@ export const Route = createFileRoute("/car/$id")({
   component: CarPage,
 });
 
-const COLORS = [
+// Pintura — cor do carro (afeta a imagem inteira)
+const PAINTS = [
   { name: "BLACK", hex: "#0a0a0a", filter: "brightness(0.7) contrast(1.1)" },
   { name: "BLOOD", hex: "#c41e3a", filter: "hue-rotate(0deg) saturate(2) brightness(0.85)" },
   { name: "ARCTIC", hex: "#e8e8e8", filter: "brightness(1.3) saturate(0.3) contrast(0.95)" },
@@ -29,8 +30,8 @@ const COLORS = [
   { name: "EMERALD", hex: "#0f7a3d", filter: "hue-rotate(120deg) saturate(1.3)" },
 ];
 
-// Accent (stripes/details) — overlay via mix-blend-mode
-const ACCENTS = [
+// Detalhes — cor de listras/aerofólio/aro (faixa fina sobre o carro, sem brilho)
+const DETAILS = [
   { name: "OFF", hex: "transparent" },
   { name: "ELECTRIC", hex: "#3b82f6" },
   { name: "YELLOW", hex: "#facc15" },
@@ -53,16 +54,40 @@ const PARTS = [
 function CarPage() {
   const { id } = useParams({ from: "/car/$id" });
   const car = useMemo(() => cars.find((c) => c.id === id)!, [id]);
-  const [colorIdx, setColorIdx] = useState(0);
-  const [accentIdx, setAccentIdx] = useState(0);
+  const [paintIdx, setPaintIdx] = useState(0);
+  const [detailIdx, setDetailIdx] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
+  const [revving, setRevving] = useState(false);
 
-  const currentColor = COLORS[colorIdx];
-  const currentAccent = ACCENTS[accentIdx];
+  const currentPaint = PAINTS[paintIdx];
+  const currentDetail = DETAILS[detailIdx];
 
-  const applyColor = (nextIdx: number) => {
+  // Build per-car engine profile from spec strings
+  const engineProfile: EngineProfile = useMemo(() => {
+    const hp = parseInt(car.specs.power.replace(/\D/g, ""), 10) || 700;
+    const eng = car.specs.engine.toLowerCase();
+    const cylinders = eng.includes("v8") ? 8 : eng.includes("v12") ? 12 : eng.includes("inline") || eng.includes("3 cilindros") ? 3 : 8;
+    const turbo = /turbo|supercharg|biturbo|twin/.test(eng);
+    return {
+      cylinders,
+      idleHz: 50 + Math.min(20, hp / 80),
+      redlineHz: 320 + Math.min(220, hp / 4),
+      turbo,
+      rough: cylinders <= 4 ? 0.6 : 0.35,
+      duration: 2.6,
+    };
+  }, [car]);
+
+  const handleRev = () => {
+    if (revving) return;
+    setRevving(true);
+    playRev(engineProfile);
+    setTimeout(() => setRevving(false), (engineProfile.duration ?? 2.6) * 1000);
+  };
+
+  const applyPaint = (nextIdx: number) => {
     playClick();
-    setColorIdx(nextIdx);
+    setPaintIdx(nextIdx);
   };
 
   return (
@@ -89,34 +114,39 @@ function CarPage() {
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
 
-          {/* Car image — light off / on swap on color change */}
-          <img
-            src={car.image}
-            alt={car.fullName}
-            loading="eager"
-            decoding="async"
-            draggable={false}
-            onDragStart={(e) => e.preventDefault()}
-            onContextMenu={(e) => e.preventDefault()}
-            className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
-            style={{ filter: currentColor.filter }}
-          />
+          {/* Turntable — slow workshop rotation */}
+          <div className="absolute inset-0 flex items-center justify-center perspective-1000">
+            <div className="relative w-full h-full animate-turntable">
+              <img
+                src={car.image}
+                alt={car.fullName}
+                loading="eager"
+                decoding="async"
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
+                onContextMenu={(e) => e.preventDefault()}
+                className={`absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out ${revving ? "animate-rev" : ""}`}
+                style={{ filter: currentPaint.filter }}
+              />
 
-          {/* Accent tint overlay */}
-          {currentAccent.hex !== "transparent" && (
-            <>
-              {/* multiply tints bright/white panels with the chosen color */}
-              <div
-                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
-                style={{ backgroundColor: currentAccent.hex, mixBlendMode: "multiply", opacity: 0.85 }}
-              />
-              {/* hue overlay reinforces saturation on mid-tones */}
-              <div
-                className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
-                style={{ backgroundColor: currentAccent.hex, mixBlendMode: "color", opacity: 0.55 }}
-              />
-            </>
-          )}
+              {/* Detail color — thin racing stripe across the car (color, no glow) */}
+              {currentDetail.hex !== "transparent" && (
+                <>
+                  <div
+                    className="absolute left-0 right-0 top-[42%] h-[6%] pointer-events-none transition-[background-color] duration-500"
+                    style={{ backgroundColor: currentDetail.hex, mixBlendMode: "multiply", opacity: 0.95 }}
+                  />
+                  <div
+                    className="absolute left-0 right-0 top-[49%] h-[2%] pointer-events-none transition-[background-color] duration-500"
+                    style={{ backgroundColor: currentDetail.hex, mixBlendMode: "normal", opacity: 0.7 }}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Workshop turntable platter shadow under the car */}
+          <div className="absolute left-1/2 bottom-3 -translate-x-1/2 w-3/4 h-3 rounded-[50%] bg-black/60 blur-md pointer-events-none" />
 
           {/* corners */}
           <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-primary" />
@@ -129,24 +159,39 @@ function CarPage() {
             <div className="text-[9px] tracking-[0.3em] text-primary">VEL. MÁX</div>
             <div className="font-display text-base md:text-lg font-black">{car.specs.topSpeed}</div>
           </div>
+
+          {/* Throttle / accelerator — click to rev */}
+          <button
+            type="button"
+            onClick={handleRev}
+            className={`absolute right-3 md:right-5 bottom-3 md:bottom-5 group flex items-center gap-2 border border-primary bg-background/80 backdrop-blur px-3 py-2 hover:bg-primary hover:text-primary-foreground transition ${revving ? "animate-pulse-red" : ""}`}
+            aria-label="Acelerar"
+          >
+            <span className="relative flex w-8 h-8 items-center justify-center rounded-full border border-primary">
+              <span className={`absolute inset-1 rounded-full bg-primary/20 ${revving ? "animate-ping" : ""}`} />
+              <span className="relative font-display text-xs">▶</span>
+            </span>
+            <span className="text-[10px] tracking-[0.3em]">{revving ? "ACELERANDO" : "ACELERAR"}</span>
+          </button>
         </div>
 
-        {/* color quick chips */}
+        {/* PINTURA — cor do carro */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">DETALHES:</span>
-          {COLORS.map((c, i) => (
-            <button key={c.name} onClick={() => applyColor(i)} className={`w-6 h-6 rounded-full border-2 transition ${colorIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">PINTURA:</span>
+          {PAINTS.map((c, i) => (
+            <button key={c.name} onClick={() => applyPaint(i)} className={`w-6 h-6 rounded-full border-2 transition ${paintIdx === i ? "border-primary scale-125" : "border-border"}`} style={{ backgroundColor: c.hex }} aria-label={c.name} />
           ))}
+          <span className="text-[10px] tracking-[0.3em] text-foreground ml-2">{currentPaint.name}</span>
         </div>
 
-        {/* second selector — base car color (accent tint) */}
+        {/* DETALHES — listras/acabamentos */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">COR DO CARRO:</span>
-          {ACCENTS.map((a, i) => (
+          <span className="text-[10px] tracking-[0.3em] text-muted-foreground mr-2">DETALHES:</span>
+          {DETAILS.map((a, i) => (
             <button
               key={a.name}
-              onClick={() => { playClick(); setAccentIdx(i); }}
-              className={`relative w-6 h-6 rounded-full border-2 transition ${accentIdx === i ? "border-primary scale-125" : "border-border"}`}
+              onClick={() => { playClick(); setDetailIdx(i); }}
+              className={`relative w-6 h-6 rounded-full border-2 transition ${detailIdx === i ? "border-primary scale-125" : "border-border"}`}
               style={{ backgroundColor: a.hex === "transparent" ? "#222" : a.hex }}
               aria-label={a.name}
               title={a.name}
@@ -154,7 +199,7 @@ function CarPage() {
               {a.hex === "transparent" && <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white/60">✕</span>}
             </button>
           ))}
-          <span className="text-[10px] tracking-[0.3em] text-foreground ml-2">{currentAccent.name}</span>
+          <span className="text-[10px] tracking-[0.3em] text-foreground ml-2">{currentDetail.name}</span>
         </div>
       </section>
 
