@@ -4,8 +4,6 @@ import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import { playClick } from "@/lib/engine-sound";
-import { CAR_360 } from "@/data/car-360";
-import { CarTurntable } from "@/components/CarTurntable";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -62,7 +60,6 @@ function CarPage() {
 
   const currentPaint = PAINTS[paintIdx];
   const currentDetail = DETAILS[detailIdx];
-  const frames = CAR_360[car.id];
 
   const applyPaint = (nextIdx: number) => {
     playClick();
@@ -93,31 +90,20 @@ function CarPage() {
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
 
-          {/* Car — true 360° turntable: only the car rotates, background stays static.
-              Falls back to the static hero image for cars without generated frames. */}
-          {frames ? (
-            <CarTurntable
-              frames={frames}
-              alt={car.fullName}
-              filter={currentPaint.filter}
-              durationSec={20}
-            />
-          ) : (
-            <img
-              src={car.image}
-              alt={car.fullName}
-              loading="eager"
-              decoding="async"
-              draggable={false}
-              onDragStart={(e) => e.preventDefault()}
-              onContextMenu={(e) => e.preventDefault()}
-              className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
-              style={{ filter: currentPaint.filter }}
-            />
-          )}
+          <img
+            src={car.image}
+            alt={car.fullName}
+            loading="eager"
+            decoding="async"
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
+            className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
+            style={{ filter: currentPaint.filter }}
+          />
 
           {/* DETALHES — accent tint overlay (color, no glow) */}
-          {!frames && currentDetail.hex !== "transparent" && (
+          {currentDetail.hex !== "transparent" && (
             <>
               <div
                 className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
