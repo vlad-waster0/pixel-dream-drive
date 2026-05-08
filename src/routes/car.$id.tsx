@@ -21,6 +21,7 @@ export const Route = createFileRoute("/car/$id")({
 
 // Pintura — cor do carro (afeta a imagem inteira)
 const PAINTS = [
+  { name: "ORIGINAL", hex: "#888888", filter: "none" },
   { name: "BLACK", hex: "#0a0a0a", filter: "brightness(0.7) contrast(1.1)" },
   { name: "BLOOD", hex: "#c41e3a", filter: "hue-rotate(0deg) saturate(2) brightness(0.85)" },
   { name: "ARCTIC", hex: "#e8e8e8", filter: "brightness(1.3) saturate(0.3) contrast(0.95)" },
