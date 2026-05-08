@@ -16,10 +16,12 @@ interface Props {
  */
 export function CarTurntable({ frames, alt, filter, durationSec = 18, className = "" }: Props) {
   const [idx, setIdx] = useState(0);
+  const [prevIdx, setPrevIdx] = useState(0);
   const [ready, setReady] = useState(false);
   const draggingRef = useRef<{ startX: number; startIdx: number } | null>(null);
   const autoRef = useRef<number | null>(null);
   const lastRef = useRef<number>(0);
+  const [blending, setBlending] = useState(false);
 
   // Preload all frames
   useEffect(() => {
@@ -46,7 +48,11 @@ export function CarTurntable({ frames, alt, filter, durationSec = 18, className 
       if (!draggingRef.current) {
         if (t - lastRef.current >= frameMs) {
           lastRef.current = t;
-          setIdx((i) => (i + 1) % frames.length);
+          setIdx((i) => {
+            setPrevIdx(i);
+            setBlending(true);
+            return (i + 1) % frames.length;
+          });
         }
       } else {
         lastRef.current = t;
@@ -71,6 +77,8 @@ export function CarTurntable({ frames, alt, filter, durationSec = 18, className 
     // One full revolution per container width dragged
     const delta = Math.round((dx / w) * frames.length);
     const next = ((d.startIdx + delta) % frames.length + frames.length) % frames.length;
+    setPrevIdx(idx);
+    setBlending(true);
     setIdx(next);
   };
   const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -86,6 +94,20 @@ export function CarTurntable({ frames, alt, filter, durationSec = 18, className 
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
+      <div className="absolute inset-x-[12%] bottom-[16%] h-[18%] rounded-full border border-primary/30 bg-primary/10 blur-3xl opacity-80 pointer-events-none" />
+      <div className="absolute left-1/2 bottom-[12%] h-[10px] w-[64%] -translate-x-1/2 rounded-full bg-primary/25 blur-md pointer-events-none" />
+      <div className="absolute left-1/2 bottom-[11.5%] h-[2px] w-[58%] -translate-x-1/2 bg-primary/70 pointer-events-none" />
+
+      {frames[prevIdx] && prevIdx !== idx && (
+        <img
+          src={frames[prevIdx]}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className={`absolute left-1/2 bottom-[14%] h-[68%] w-auto max-w-[88%] -translate-x-1/2 object-contain pointer-events-none transition-opacity duration-500 ease-out ${blending ? "opacity-0" : "opacity-100"}`}
+          style={{ filter, transformOrigin: "center bottom" }}
+        />
+      )}
       {frames.map((src, i) => (
         <img
           key={src}
@@ -96,8 +118,8 @@ export function CarTurntable({ frames, alt, filter, durationSec = 18, className 
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           onContextMenu={(e) => e.preventDefault()}
-          className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
-          style={{ filter, opacity: i === idx ? 1 : 0 }}
+          className={`absolute left-1/2 bottom-[14%] h-[68%] w-auto max-w-[88%] -translate-x-1/2 object-contain pointer-events-none transition-[opacity,filter] duration-500 ease-out ${i === idx ? "opacity-100" : "opacity-0"}`}
+          style={{ filter, transformOrigin: "center bottom" }}
         />
       ))}
       {/* Drag hint */}
