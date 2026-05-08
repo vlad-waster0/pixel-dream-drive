@@ -3,7 +3,9 @@ import { useState, useMemo } from "react";
 import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
-import { playClick, playRev, type EngineProfile } from "@/lib/engine-sound";
+import { playClick } from "@/lib/engine-sound";
+import { CAR_360 } from "@/data/car-360";
+import { CarTurntable } from "@/components/CarTurntable";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -57,33 +59,10 @@ function CarPage() {
   const [paintIdx, setPaintIdx] = useState(0);
   const [detailIdx, setDetailIdx] = useState(0);
   const [openPart, setOpenPart] = useState<number | null>(null);
-  const [revving, setRevving] = useState(false);
 
   const currentPaint = PAINTS[paintIdx];
   const currentDetail = DETAILS[detailIdx];
-
-  // Build per-car engine profile from spec strings
-  const engineProfile: EngineProfile = useMemo(() => {
-    const hp = parseInt(car.specs.power.replace(/\D/g, ""), 10) || 700;
-    const eng = car.specs.engine.toLowerCase();
-    const cylinders = eng.includes("v8") ? 8 : eng.includes("v12") ? 12 : eng.includes("inline") || eng.includes("3 cilindros") ? 3 : 8;
-    const turbo = /turbo|supercharg|biturbo|twin/.test(eng);
-    return {
-      cylinders,
-      idleHz: 50 + Math.min(20, hp / 80),
-      redlineHz: 320 + Math.min(220, hp / 4),
-      turbo,
-      rough: cylinders <= 4 ? 0.6 : 0.35,
-      duration: 2.6,
-    };
-  }, [car]);
-
-  const handleRev = () => {
-    if (revving) return;
-    setRevving(true);
-    playRev(engineProfile);
-    setTimeout(() => setRevving(false), (engineProfile.duration ?? 2.6) * 1000);
-  };
+  const frames = CAR_360[car.id];
 
   const applyPaint = (nextIdx: number) => {
     playClick();
@@ -114,18 +93,28 @@ function CarPage() {
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
 
-          {/* Car — slowly rotating like on a workshop turntable. Only the car itself spins. */}
-          <img
-            src={car.image}
-            alt={car.fullName}
-            loading="eager"
-            decoding="async"
-            draggable={false}
-            onDragStart={(e) => e.preventDefault()}
-            onContextMenu={(e) => e.preventDefault()}
-            className={`absolute inset-0 w-full h-full object-cover animate-turntable transition-[filter] duration-500 ease-out ${revving ? "animate-rev" : ""}`}
-            style={{ filter: currentPaint.filter }}
-          />
+          {/* Car — true 360° turntable: only the car rotates, background stays static.
+              Falls back to the static hero image for cars without generated frames. */}
+          {frames ? (
+            <CarTurntable
+              frames={frames}
+              alt={car.fullName}
+              filter={currentPaint.filter}
+              durationSec={20}
+            />
+          ) : (
+            <img
+              src={car.image}
+              alt={car.fullName}
+              loading="eager"
+              decoding="async"
+              draggable={false}
+              onDragStart={(e) => e.preventDefault()}
+              onContextMenu={(e) => e.preventDefault()}
+              className="absolute inset-0 w-full h-full object-cover transition-[filter] duration-500 ease-out"
+              style={{ filter: currentPaint.filter }}
+            />
+          )}
 
           {/* DETALHES — accent tint overlay (color, no glow) */}
           {currentDetail.hex !== "transparent" && (
@@ -152,20 +141,6 @@ function CarPage() {
             <div className="text-[9px] tracking-[0.3em] text-primary">VEL. MÁX</div>
             <div className="font-display text-base md:text-lg font-black">{car.specs.topSpeed}</div>
           </div>
-
-          {/* Throttle / accelerator — click to rev */}
-          <button
-            type="button"
-            onClick={handleRev}
-            className={`absolute right-3 md:right-5 bottom-3 md:bottom-5 group flex items-center gap-2 border border-primary bg-background/80 backdrop-blur px-3 py-2 hover:bg-primary hover:text-primary-foreground transition ${revving ? "animate-pulse-red" : ""}`}
-            aria-label="Acelerar"
-          >
-            <span className="relative flex w-8 h-8 items-center justify-center rounded-full border border-primary">
-              <span className={`absolute inset-1 rounded-full bg-primary/20 ${revving ? "animate-ping" : ""}`} />
-              <span className="relative font-display text-xs">▶</span>
-            </span>
-            <span className="text-[10px] tracking-[0.3em]">{revving ? "ACELERANDO" : "ACELERAR"}</span>
-          </button>
         </div>
 
         {/* PINTURA — cor do carro */}
