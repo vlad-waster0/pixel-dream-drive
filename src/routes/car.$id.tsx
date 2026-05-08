@@ -126,7 +126,7 @@ function CarPage() {
           )}
 
           {/* DETALHES — accent tint overlay (color, no glow) */}
-          {!is3D && !isSketchfab && currentDetail.hex !== "transparent" && (
+          {!is3D && currentDetail.hex !== "transparent" && (
             <>
               <div
                 className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
