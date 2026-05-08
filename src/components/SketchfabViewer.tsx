@@ -53,13 +53,13 @@ export function SketchfabViewer({
         title={`${title} — 360°`}
         src={src}
         className="absolute inset-0 w-full h-full"
-        style={{ filter, transition: "filter 500ms ease-out", transform: "scale(0.92)", transformOrigin: "center center" }}
+        style={{ filter, transition: "filter 500ms ease-out", transform: "scale(0.92) translateY(4%)", transformOrigin: "center center" }}
         frameBorder={0}
         allow="autoplay; fullscreen; xr-spatial-tracking"
         allowFullScreen
       />
       {/* Máscara inferior: esconde botões e logo do Sketchfab */}
-      <div className="absolute left-0 right-0 bottom-0 h-16 bg-card pointer-events-none" />
+      <div className="absolute left-0 right-0 -bottom-3 h-16 bg-card pointer-events-none" />
       {/* Máscara lateral superior: esconde botão de share */}
       <div className="absolute right-0 top-0 w-14 h-14 bg-card pointer-events-none" />
     </div>
