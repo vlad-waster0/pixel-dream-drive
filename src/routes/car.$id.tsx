@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 const Car3DViewer = lazy(() =>
   import("@/components/Car3DViewer").then((m) => ({ default: m.Car3DViewer })),
 );
+import { SketchfabViewer, SKETCHFAB_MODELS } from "@/components/SketchfabViewer";
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -66,6 +67,8 @@ function CarPage() {
   const currentPaint = PAINTS[paintIdx];
   const currentDetail = DETAILS[detailIdx];
   const is3D = car.id === "cc8s";
+  const sketchfabId = SKETCHFAB_MODELS[car.id];
+  const isSketchfab = Boolean(sketchfabId);
 
   const applyPaint = (nextIdx: number) => {
     playClick();
@@ -96,7 +99,11 @@ function CarPage() {
         <div className="relative aspect-[16/9] overflow-hidden bg-card border border-border">
           <div className="absolute inset-0 bg-grid opacity-20" />
 
-          {is3D ? (
+          {isSketchfab ? (
+            <div className="absolute inset-0">
+              <SketchfabViewer modelId={sketchfabId!} title={car.fullName} />
+            </div>
+          ) : is3D ? (
             <div className="absolute inset-0">
               {typeof window !== "undefined" && (
                 <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center text-[10px] tracking-[0.4em] text-primary">CARREGANDO 3D…</div>}>
@@ -119,7 +126,7 @@ function CarPage() {
           )}
 
           {/* DETALHES — accent tint overlay (color, no glow) */}
-          {!is3D && currentDetail.hex !== "transparent" && (
+          {!is3D && !isSketchfab && currentDetail.hex !== "transparent" && (
             <>
               <div
                 className="absolute inset-0 pointer-events-none transition-[background-color] duration-500"
