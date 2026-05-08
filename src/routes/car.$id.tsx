@@ -4,7 +4,10 @@ import { cars } from "@/data/cars";
 import { Header } from "@/components/landing/Header";
 import { getUser } from "@/lib/auth";
 import { playClick } from "@/lib/engine-sound";
-import { Car3DViewer } from "@/components/Car3DViewer";
+import { lazy, Suspense } from "react";
+const Car3DViewer = lazy(() =>
+  import("@/components/Car3DViewer").then((m) => ({ default: m.Car3DViewer })),
+);
 import engineImg from "@/assets/parts/engine.png";
 import wheelImg from "@/assets/parts/wheel.png";
 import steeringImg from "@/assets/parts/steering.png";
@@ -95,7 +98,11 @@ function CarPage() {
 
           {is3D ? (
             <div className="absolute inset-0">
-              <Car3DViewer color={currentPaint.hex} />
+              {typeof window !== "undefined" && (
+                <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center text-[10px] tracking-[0.4em] text-primary">CARREGANDO 3D…</div>}>
+                  <Car3DViewer color={currentPaint.hex} />
+                </Suspense>
+              )}
             </div>
           ) : (
           <img
